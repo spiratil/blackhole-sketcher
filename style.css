@@ -1,0 +1,13 @@
+body {
+  margin: 0;
+  height: 100vh;
+}
+
+.background {
+  position: fixed;
+  width: 120vw;
+  object-fit: cover;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
