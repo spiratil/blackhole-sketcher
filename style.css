@@ -1,16 +1,23 @@
+@font-face {
+  font-family: 'Audiowide';
+  src: url('./font/Audiowide-Regular.ttf') format('truetype');
+}
+
 :root {
-  --content-area-width: 120vw;
+  --content-area-width: 120vw; /*Initial value on site load only*/
   --content-area-height: "";
   --main-font-color: white;
-  --second-font-color: grey;
+  --second-font-color: black;
   --container-background-color: grey;
   --border-curve: 25px;
-  --header-footer-height: 100px;
+  --pixel-size: 0px;
 }
 
 body {
   margin: 0;
   height: 100vh;
+  color: var(--main-font-color);
+  font-family: 'Audiowide', Arial, Helvetica, sans-serif;
 }
 
 .background {
@@ -25,12 +32,22 @@ body {
   transform: translate(-50%, -50%);
 }
 
+a {
+  color: var(--second-font-color);
+}
+
 header {
   background: var(--container-background-color);
   position: fixed;
   top: 0;
   width: 100%;
-  height: var(--header-footer-height);
+  height: fit-content;
+  padding: 3px 0;
+}
+
+h1 {
+  margin: 5px;
+  text-align: center;
 }
 
 .content {
@@ -41,11 +58,23 @@ header {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+  align-items: center;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
 }
 
 .pixels-container {
-  background: rgba(255,0,0,0.5);
-  width: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pixel {
+  width: var(--pixel-size);
+  height: var(--pixel-size);
 }
 
 .controls {
@@ -60,5 +89,11 @@ footer {
   position: fixed;
   bottom: 0;
   width: 100%;
-  height: var(--header-footer-height);
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+footer > * {
+  margin: 0 30px;
 }
