@@ -1,3 +1,13 @@
+:root {
+  --content-area-width: 120vw;
+  --content-area-height: "";
+  --main-font-color: white;
+  --second-font-color: grey;
+  --container-background-color: grey;
+  --border-curve: 25px;
+  --header-footer-height: 100px;
+}
+
 body {
   margin: 0;
   height: 100vh;
@@ -5,9 +15,50 @@ body {
 
 .background {
   position: fixed;
-  width: 120vw;
+  min-width: 100%;
+  min-height: 100%;
+  width: var(--content-area-width);
+  height: var(--content-area-height);
   object-fit: cover;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+header {
+  background: var(--container-background-color);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: var(--header-footer-height);
+}
+
+.content {
+  position: fixed;
+  width: 100%;
+  top: 50%;
+  transform: translate(0, -50%);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.pixels-container {
+  background: rgba(255,0,0,0.5);
+  width: 600px;
+}
+
+.controls {
+  background: var(--container-background-color);
+  border-radius: var(--border-curve);
+  width: 15vw;
+  height: 50vh;
+}
+
+footer {
+  background: var(--container-background-color);
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: var(--header-footer-height);
 }
