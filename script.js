@@ -45,7 +45,7 @@ function resizeDocumentElements() {
   setPixelSizes();
 }
 
-// PI * total squares ^ 2 / radius
+// Calculates the length of the pixel squares for a given circle radius and maximum number of squares
 function calcPixelLength() {
   const totalSqrs = 1000; // N
   const radius = pixelsCon.clientWidth / 2; // r
@@ -55,29 +55,46 @@ function calcPixelLength() {
   // c = 2 * SQRT( r^2 - d^2 )
   // Initially set to the length of one pixel length from the center of the circle
   const chord = 2 * Math.sqrt( Math.pow(radius, 2) - Math.pow(pixelLength, 2) );
+
+  // Calculate the maximum number of pixels that can fill each row of the circle
+  // starting from the center and moving out towards the edges. Add these results
+  // to an array indicating the number of pixels to add to each row for when building
+  // the grid
+  let row = 1, rowArr = [];
+  while (true) {
+    if (row * pixelLength > radius) break; // Exit if the chord length is larger than the radius
+    // FLOOR( 2 * SQRT(r^2 - c^2) / L )
+    let rowTotal = Math.floor(2 * Math.sqrt(Math.pow(radius,2) - Math.pow(row * pixelLength,2)) / pixelLength);
+    if (rowTotal % 2 !== 0) rowTotal--; // Ensure that the number of squares are even
+    rowArr.push(rowTotal);
+    row++;
+  }
+
+  let arrClone = [...rowArr];
   return {
     N: totalSqrs,
     r: radius,
     L: pixelLength,
-    c: chord
+    c: chord,
+    // Array of pixel count by ordered row from top to bottom of grid
+    rows: [...arrClone.reverse().concat(rowArr)]
   };
 }
 
 async function createGrid() {
-  pixelsCon.innerHTML = "";
   let params = calcPixelLength()
-  console.log(params)
 
-  cssVars.style.setProperty('--pixel-size', `${params.L}px`);
-  const row = document.createElement('div');
-  const pixel = document.createElement('div');
+  const row = document.createElement('div'); // Pixel row container div 
+  row.classList.add(`row`);
+  const pixel = document.createElement('div'); // Individual pixel div
   pixel.classList.add("pixel");
+  pixelsCon.textContent = ""; // Clear previous grid
+  cssVars.style.setProperty('--pixel-size', `${params.L}px`);
 
-  for (let y = 1; y * params.L < params.r; y++) {
+  // Iterate through the array of total squares per row and create each pixel div
+  for (let y = 0; y < params.rows.length; y++) {
     let rowClone = row.cloneNode();
-    rowClone.classList.add(`row`);
-    
-    for (let x = 1; x * params.L < params.c; x++) {
+    for (let x = 0; x < params.rows[y]; x++) {
       let pixelClone = pixel.cloneNode();
       pixelClone.style.background = `rgb(
         ${Math.ceil(Math.random()*255).toString()},
@@ -86,20 +103,7 @@ async function createGrid() {
       )`;
       rowClone.appendChild(pixelClone);
     }
-
     pixelsCon.appendChild(rowClone);
-
-    // Calculate the new chord length for the next row
-    // chord = 2 * SQRT( radius ^ 2 - chord distance from circle center ^ 2 )
-    params.c = 2 * Math.sqrt( Math.pow(params.r,2) - Math.pow(params.L * (y + 1),2) );
-  }
-
-  // Iterate over the created grid and add the remaining pixels required
-  let pixelsConClone = pixelsCon.cloneNode(true);
-  console.log(pixelsConClone)
-  for (let y = 0; y < pixelsConClone.childElementCount; y++) {
-    const rowClone = pixelsConClone.children[y].cloneNode(true);
-    pixelsCon.insertBefore(rowClone, pixelsCon.children[0]);
   }
 }
 
