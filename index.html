@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" sizes="32x32">
     <link rel="stylesheet" type="text/css" href="./style.css">
     <script src="./script.js" defer></script>
     <title>Blackhole Sketcher</title>
@@ -13,9 +14,52 @@
       <h1>Blackhole Sketcher</h1>
     </header>
     <div class="content">
-      <div class="controls left-control"></div>
-      <div class="pixels-container"></div>
-      <div class="controls right-control"></div>
+      <div class="controls left-control">
+        <div class="colour-pickers">
+          <input id="left-colour" type="color" name="left-colour" value="#ff0000">
+          <label for="left-colour">#ff0000</label>
+          <input id="right-colour" type="color" value="#ff0000">
+          <label for="right-colour">#ff0000</label>
+          <button id="rainbow-button">Rainbow</button>
+          <button id="greyscale-button">Greyscale</button>
+        </div>
+        <div class="grid">
+          <input id="grid-slider" type="range" min="1" max="100" value="50">
+          <div>
+            <input id="grid-checkbox" type="checkbox" name="show-grid" value="show">
+            <label for="show-grid"> Show Grid</label>
+          </div>
+          <div>
+            <label for="grid-colour"> #ff0000</label>
+            <input id="grid-colour" type="color" name="grid-colour" value="#ff0000">
+            <label for="grid-line"> #ff0000</label>
+            <select id="grid-line" name="grid-line">
+              <option value="solid">Solid</option>
+              <option value="dashed">Dashed</option>
+              <option value="dotted">Dotted</option>
+            </select>
+          </div>
+        </div>
+        <div class="tools">
+          <div>Draw</div>
+          <div>Eraser</div>
+          <div>Select</div>
+          <div>Move</div>
+        </div>
+      </div>
+      <div class="cells-container"></div>
+      <div class="controls right-control">
+        <div>
+          <div>Undo</div>
+          <div>Redo</div>
+        </div>
+        <div>Clear All</div>
+        <div>Colour Random</div>
+        <div>Greyscale Random</div>
+        <div>Download</div>
+        <div>Info</div>
+        <div>Reset App</div>
+      </div>
     </div>
     <footer>
       <div>Created with ❤️ by spiratil</div>

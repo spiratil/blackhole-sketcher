@@ -6,11 +6,14 @@
 :root {
   --content-area-width: 120vw; /*Initial value on site load only*/
   --content-area-height: "";
+  /*--cell-container-height: "";
+  --cell-container-width: "";*/
   --main-font-color: white;
   --second-font-color: black;
-  --container-background-color: grey;
+  --panel-background-color: rgba(105, 150, 219, 0.5);
   --border-curve: 25px;
-  --pixel-size: 0px;
+  --cell-size: 0px;
+  --cell-color: black;
 }
 
 body {
@@ -37,7 +40,7 @@ a {
 }
 
 header {
-  background: var(--container-background-color);
+  background: var(--panel-background-color);
   position: fixed;
   top: 0;
   width: 100%;
@@ -66,26 +69,37 @@ h1 {
   justify-content: center;
 }
 
-.pixels-container {
+.cells-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  /*
+  height: var(--cell-container-height);
+  width: var(--cell-container-width);
+  */
 }
 
-.pixel {
-  width: var(--pixel-size);
-  height: var(--pixel-size);
+.cell {
+  box-sizing: border-box;
+  border: none;
+  background: var(--cell-color);
+  width: var(--cell-size);
+  height: var(--cell-size);
 }
 
 .controls {
-  background: var(--container-background-color);
+  background: var(--panel-background-color);
   border-radius: var(--border-curve);
   width: 15vw;
   height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 footer {
-  background: var(--container-background-color);
+  background: var(--panel-background-color);
   position: fixed;
   bottom: 0;
   width: 100%;
@@ -96,4 +110,20 @@ footer {
 
 footer > * {
   margin: 0 30px;
+}
+
+
+
+
+
+.cells-container .row .leading-line {
+  background: rgba(105, 150, 219);
+}
+
+.cells-container .row .trail-line-one {
+  background: rgba(52, 75, 110);
+}
+
+.cells-container .row .trail-line-two {
+  background: rgba(26, 37, 55);
 }
