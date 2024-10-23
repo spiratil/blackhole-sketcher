@@ -8,7 +8,7 @@ const footer = document.querySelector('footer');
 
 // Global variables
 const ratio = 5 / 18; // Ratio of the blackhole cells to the total image dimension cells
-let grid; // Contains colour for each cell on the sketcher
+let grid; // Contains color for each cell on the sketcher
 let clearDelay // Timeout variable for setting a delay when clearing the canvas
 
 // Sleep function
@@ -23,7 +23,7 @@ function getDocumentSmallestDimension() {
   let maxHeight = window.innerHeight - header.clientHeight - footer.clientHeight - 100;
   let maxWidth = window.innerWidth - 2 * controls[0].clientWidth - 200; // Control panel widths and minimum spacing between
   if (maxHeight < maxWidth) return { dimension: 'height', size: maxHeight / ratio };
-  else return { dimension: 'width', size: maxHeight / ratio };
+  else return { dimension: 'width', size: maxWidth / ratio };
 }
 
 function setBackgroundSize(dimension, size) {
@@ -96,7 +96,7 @@ function createNewGrid(rows) {
   }
 }
 
-// Show a rolling wave move across the canvas and clear to the background colour
+// Show a rolling wave move across the canvas and clear to the background color
 async function clearCanvas() {
   let trailLines = [[], [], []];
   let point;

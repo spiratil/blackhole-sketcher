@@ -17,48 +17,39 @@
       <div class="controls left-control">
         <div class="tool-options">
           <div id="draw-tools">
-            <div class="preset-colours">
-              <div id="default-colour" class="colour-picker small-picker selectable"></div>
-              <div id="rainbow-colour" class="colour-picker small-picker selectable"></div>
-              <div id="greyscale-colour" class="colour-picker small-picker selectable"></div>
-              <div id="custom-colour" class="colour-picker small-picker selectable"></div>
+            <div class="preset-colors">
+              <div id="default-color" class="color-picker small-picker selectable"></div>
+              <div id="rainbow-color" class="color-picker small-picker selectable"></div>
+              <div id="greyscale-color" class="color-picker small-picker selectable"></div>
+              <div id="custom-color" class="color-picker small-picker selectable"></div>
             </div>
             <div class="mouse-selectors">
-              <div id="left-mouse-colour">
-                <div class="colour-hex">#ffffff</div>
-                <input class="colour-picker large-picker selectable" type="color" value="#ffffff"></input>
+              <div id="left-mouse-color">
+                <div class="color-hex">#000000</div>
+                <input class="color-picker large-picker selectable" type="color" value="#000000"></input>
               </div>
-              <div id="right-mouse-colour">
-                <input class="colour-picker large-picker selectable" type="color" value="#000000"></input>
-                <div class="colour-hex right-colour">#000000</div>
+              <div id="right-mouse-color">
+                <input class="color-picker large-picker selectable" type="color" value="#FFFFFF"></input>
+                <div class="color-hex right-color">#FFFFFF</div>
               </div>
-            </div class="colour-profiles">
-            <div id="line-tools" style="display: none;">
-
-            </div>
-            <div id="erase-tools" style="display: none;">
-
-            </div>
-            <div id="move-tools" style="display: none;">
-
-            </div>
+            </div class="color-profiles">
           </div>
         </div>
         <div class="tool-selection">
           <div>
-            <img class="icon" src="./imgs/draw-icon.png" alt="draw tool">
+            <img class="icon selectable" src="./imgs/draw-icon.png" alt="draw tool">
             <div class="icon-selected-background"></div>
           </div>
           <div>
-            <img class="icon" src="./imgs/erase-icon.png" alt="erase tool">
+            <img class="icon selectable" src="./imgs/erase-icon.png" alt="erase tool">
             <div class="icon-selected-background"></div>
           </div>
           <div>
-            <img class="icon" src="./imgs/line-icon.png" alt="line tool">
+            <img class="icon selectable" src="./imgs/line-icon.png" alt="line tool">
             <div class="icon-selected-background"></div>
           </div>
           <div>
-            <img class="icon" src="./imgs/move-icon.png" alt="move tool">
+            <img class="icon selectable" src="./imgs/move-icon.png" alt="move tool">
             <div class="icon-selected-background"></div>
           </div>
         </div>
@@ -67,24 +58,18 @@
       <div class="controls right-control">
         <div id="history">
           <div id="undo-button">
-            <img class="icon history-button" src="./imgs/undo-icon.png" alt="undo last action">
+            <img class="icon history-button selectable" src="./imgs/undo-icon.png" alt="undo last action">
             <div class="icon-selected-background"></div>
           </div>
           <div id="redo-button">
-            <img class="icon history-button" src="./imgs/redo-icon.png" alt="redo last action">
+            <img class="icon history-button selectable" src="./imgs/redo-icon.png" alt="redo last action">
             <div class="icon-selected-background"></div>
           </div>
-        </div>
-        <div class="information">
-          <h2>Information</h2>
-          <div>Total Cells: <span class="info-total-cells"></span></div>
-          <div>Selected Tool: <span class="info-selected-tool"></span></div>
-          <div>Tool Size: <span class="info-tool-size"></span></div>
         </div>
         <div class="canvas">
           <h2>Canvas Options</h2>
           <div class="canvas-size">
-            <label for="canvas-size">Canvas Size: </label>
+            <label for="canvas-size">Canvas Size: <span class="info-total-cells"></span></label>
             <input id="grid-slider" class="selectable" type="range" name="canvas-size" min="1" max="100" value="50">
           </div>
           <div class="canvas-options">
@@ -102,9 +87,19 @@ Line:</pre></label>
             </select>
           </div>
           <div class="canvas-options">
-            <label for="grid-colour"><pre>Grid
+            <label for="grid-color"><pre>Grid
 Size:</pre></label>
-            <input id="grid-colour" class="selectable colour-picker" type="color" name="grid-colour" value="#ffffff">
+            <input id="grid-color" class="selectable color-picker" type="color" name="grid-color" value="#ffffff">
+          </div>
+          <div class="canvas-options">
+            <label for="canvas-color"><pre>Canvas
+Colour:</pre></label>
+            <input id="canvas-color" class="selectable color-picker" type="color" name="canvas-color" value="#ffffff">
+          </div>
+          <div class="canvas-options">
+            <label for="hover-color"><pre>Hover
+Colour:</pre></label>
+            <input id="hover-color" class="selectable color-picker" type="color" name="hover-color" value="#ffffff">
           </div>
         </div>
         <div class="settings-buttons">
@@ -112,7 +107,7 @@ Size:</pre></label>
           <div>
             <button id="clear-button">Clear All</button>
           </div>
-          <button id="random-colour-button">Rainbow Fill</button>
+          <button id="random-color-button">Rainbow Fill</button>
           <button id="random-greyscale-button">Greyscale Fill</button>
           <button id="download-button">Download Image</button>
           <button id="reset-button">Reset App</button>
