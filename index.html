@@ -9,56 +9,114 @@
     <title>Blackhole Sketcher</title>
   </head>
   <body>
-    <img class="background" src="./imgs/background.jpg">
+    <img class="background" src="./imgs/background.jpg" alt="a blackhole surrounded by a blue and purple nebular">
     <header>
       <h1>Blackhole Sketcher</h1>
     </header>
     <div class="content">
       <div class="controls left-control">
-        <div class="colour-pickers">
-          <input id="left-colour" type="color" name="left-colour" value="#ff0000">
-          <label for="left-colour">#ff0000</label>
-          <input id="right-colour" type="color" value="#ff0000">
-          <label for="right-colour">#ff0000</label>
-          <button id="rainbow-button">Rainbow</button>
-          <button id="greyscale-button">Greyscale</button>
+        <div class="tool-options">
+          <div id="draw-tools">
+            <div class="preset-colours">
+              <div id="default-colour" class="colour-picker small-picker selectable"></div>
+              <div id="rainbow-colour" class="colour-picker small-picker selectable"></div>
+              <div id="greyscale-colour" class="colour-picker small-picker selectable"></div>
+              <div id="custom-colour" class="colour-picker small-picker selectable"></div>
+            </div>
+            <div class="mouse-selectors">
+              <div id="left-mouse-colour">
+                <div class="colour-hex">#ffffff</div>
+                <input class="colour-picker large-picker selectable" type="color" value="#ffffff"></input>
+              </div>
+              <div id="right-mouse-colour">
+                <input class="colour-picker large-picker selectable" type="color" value="#000000"></input>
+                <div class="colour-hex right-colour">#000000</div>
+              </div>
+            </div class="colour-profiles">
+            <div id="line-tools" style="display: none;">
+
+            </div>
+            <div id="erase-tools" style="display: none;">
+
+            </div>
+            <div id="move-tools" style="display: none;">
+
+            </div>
+          </div>
         </div>
-        <div class="grid">
-          <input id="grid-slider" type="range" min="1" max="100" value="50">
+        <div class="tool-selection">
           <div>
-            <input id="grid-checkbox" type="checkbox" name="show-grid" value="show">
-            <label for="show-grid"> Show Grid</label>
+            <img class="icon" src="./imgs/draw-icon.png" alt="draw tool">
+            <div class="icon-selected-background"></div>
           </div>
           <div>
-            <label for="grid-colour"> #ff0000</label>
-            <input id="grid-colour" type="color" name="grid-colour" value="#ff0000">
-            <label for="grid-line"> #ff0000</label>
-            <select id="grid-line" name="grid-line">
+            <img class="icon" src="./imgs/erase-icon.png" alt="erase tool">
+            <div class="icon-selected-background"></div>
+          </div>
+          <div>
+            <img class="icon" src="./imgs/line-icon.png" alt="line tool">
+            <div class="icon-selected-background"></div>
+          </div>
+          <div>
+            <img class="icon" src="./imgs/move-icon.png" alt="move tool">
+            <div class="icon-selected-background"></div>
+          </div>
+        </div>
+      </div>
+      <div class="cells-container"></div>
+      <div class="controls right-control">
+        <div id="history">
+          <div id="undo-button">
+            <img class="icon history-button" src="./imgs/undo-icon.png" alt="undo last action">
+            <div class="icon-selected-background"></div>
+          </div>
+          <div id="redo-button">
+            <img class="icon history-button" src="./imgs/redo-icon.png" alt="redo last action">
+            <div class="icon-selected-background"></div>
+          </div>
+        </div>
+        <div class="information">
+          <h2>Information</h2>
+          <div>Total Cells: <span class="info-total-cells"></span></div>
+          <div>Selected Tool: <span class="info-selected-tool"></span></div>
+          <div>Tool Size: <span class="info-tool-size"></span></div>
+        </div>
+        <div class="canvas">
+          <h2>Canvas Options</h2>
+          <div class="canvas-size">
+            <label for="canvas-size">Canvas Size: </label>
+            <input id="grid-slider" class="selectable" type="range" name="canvas-size" min="1" max="100" value="50">
+          </div>
+          <div class="canvas-options">
+            <label for="show-grid"><pre>Show
+Grid:</pre></label>
+            <input id="grid-checkbox" class="selectable" type="checkbox" name="show-grid" value="show">
+          </div>
+          <div class="canvas-options">
+            <label for="grid-line"><pre>Grid
+Line:</pre></label>
+            <select id="grid-line" class="selectable" name="grid-line">
               <option value="solid">Solid</option>
               <option value="dashed">Dashed</option>
               <option value="dotted">Dotted</option>
             </select>
           </div>
+          <div class="canvas-options">
+            <label for="grid-colour"><pre>Grid
+Size:</pre></label>
+            <input id="grid-colour" class="selectable colour-picker" type="color" name="grid-colour" value="#ffffff">
+          </div>
         </div>
-        <div class="tools">
-          <div>Draw</div>
-          <div>Eraser</div>
-          <div>Select</div>
-          <div>Move</div>
+        <div class="settings-buttons">
+          <h2>App Options</h2>
+          <div>
+            <button id="clear-button">Clear All</button>
+          </div>
+          <button id="random-colour-button">Rainbow Fill</button>
+          <button id="random-greyscale-button">Greyscale Fill</button>
+          <button id="download-button">Download Image</button>
+          <button id="reset-button">Reset App</button>
         </div>
-      </div>
-      <div class="cells-container"></div>
-      <div class="controls right-control">
-        <div>
-          <div>Undo</div>
-          <div>Redo</div>
-        </div>
-        <div>Clear All</div>
-        <div>Colour Random</div>
-        <div>Greyscale Random</div>
-        <div>Download</div>
-        <div>Info</div>
-        <div>Reset App</div>
       </div>
     </div>
     <footer>

@@ -16,7 +16,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // Event listeners
 window.addEventListener('resize', resizeDocumentElements);
-document.querySelector('#rainbow-button').addEventListener('click', () => createNewCanvas());
+//document.querySelector('#rainbow-button').addEventListener('click', () => createNewCanvas());
 
 // Set the initial size of the background image
 function getDocumentSmallestDimension() {
@@ -50,7 +50,7 @@ function resizeDocumentElements() {
 
 // Calculates the length of the cell squares for a given circle radius and maximum number of squares
 function calcCellLength() {
-  const totalSqrs = 1000; // N
+  const totalSqrs = 2000; // N
   const radius = (bgImg.clientWidth * ratio) / 2; // r
 
   // L = SQRT( PI * r^2 / N )
