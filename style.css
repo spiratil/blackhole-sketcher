@@ -5,7 +5,7 @@
 
 /* Cell animations */
 @keyframes cell-hover-in {
-  from {background: var(--cell-color); box-shadow:  }
+  from {background: var(--cell-color); }
   to {background: var(--cell-hover-color);}
 }
 
@@ -103,6 +103,12 @@ h1 {
   text-align: center;
 }
 
+h2 {
+  margin: 0;
+  text-align: center;
+}
+
+/* Cells */
 .content {
   position: fixed;
   width: 100%;
@@ -114,18 +120,18 @@ h1 {
   align-items: center;
 }
 
-.row {
-  display: flex;
-  justify-content: center;
-}
-
 .cells-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-.cell {
+.cells-container .row {
+  display: flex;
+  justify-content: center;
+}
+
+.cells-container .cell {
   box-sizing: border-box;
   border: none;
   background: var(--cell-color);
@@ -134,7 +140,7 @@ h1 {
   animation: cell-hover-out 1s;
 }
 
-.cell:hover {
+.cells-container .cell:hover {
   animation: cell-hover-in 0.1s forwards;
 }
 
@@ -150,6 +156,7 @@ h1 {
   background: var(--trail-line-two-color);
 }
 
+/* Panels */
 .controls {
   background: var(--panel-background-color);
   border-radius: var(--border-curve);
@@ -203,7 +210,7 @@ h1 {
   font-size: 1cqw;
 }
 
-/* color picker stylings */
+/* Color pickers */
 .color-picker {
   padding: 0;
   appearance: none;
@@ -229,6 +236,7 @@ input[type="color"]::-webkit-color-swatch {
   border-color: transparent;
 }
 
+/* Colour selectors for the drawing tool in the left panel */
 #draw-tools .small-picker {
   aspect-ratio: 1 / 1;
   flex: 1 1 auto;
@@ -253,6 +261,7 @@ input[type="color"]::-webkit-color-swatch {
   height: auto;
 }
 
+/* Tool selection icons in the left panel */
 .tool-selection {
   display: flex;
   justify-content: space-around;
@@ -282,7 +291,7 @@ input[type="color"]::-webkit-color-swatch {
   height: auto;
 }
 
-/* Icon styling */
+/* Icons */
 .icon, .icon ~ .icon-selected-background {
   animation: scale-out 0.1s;
 }
@@ -311,89 +320,8 @@ input[type="color"]::-webkit-color-swatch {
   z-index: -1;
 }
 
-#history {
-  display: flex;
-  justify-content: center;
-  gap: 50px;
-}
-
-#history > * {
-  position: relative;
-}
-
-#history .history-button {
-  height: 50px;
-  width: auto;
-}
-
-h2 {
-  margin: 0;
-  text-align: center;
-}
-
-.canvas {
-  padding: 10px 20px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 5px;
-  width: 100%;
-}
-
-input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none; 
-  width: 100%;
-  cursor: pointer;
-  outline: none;
-  overflow: hidden;
-  border-radius: 16px;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-  height: 15px;
-  background: white;
-  border-radius: 16px;
-}
-
-/* Track: Mozilla Firefox */
-input[type="range"]::-moz-range-track {
-  height: 15px;
-  background: white;
-  border-radius: 16px;
-}
-
-/* Thumb: webkit */
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none; 
-  height: 15px;
-  width: 15px;
-  background-color: white;
-  border-radius: 50%;
-  border: 2px solid var(--icon-hover-color);
-  box-shadow: -407px 0 0 400px var(--icon-hover-color);
-}
-
-/* Thumb: Firefox */
-input[type="range"]::-moz-range-thumb {
-  height: 15px;
-  width: 15px;
-  background-color: white;
-  border-radius: 50%;
-  border: 1px solid var(--icon-hover-color);
-  box-shadow: -407px 0 0 400px var(--icon-hover-color);
-}
-
-.canvas input[id="grid-slider"] {
-  margin-top: 5px;
-}
-
-.canvas #grid-slider::-webkit-slider-thumb {
-  background: var(--icon-hover-color);
- }
-
-.canvas .canvas-options {
+ /* Right panel positioning */
+ .canvas .canvas-options {
   display: flex;
   gap: 5px;
   flex-direction: column;
@@ -411,6 +339,84 @@ input[type="range"]::-moz-range-thumb {
   margin: auto;
 }
 
+/* Undo and Redo icons */
+#history {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+}
+
+#history > * {
+  position: relative;
+}
+
+#history .history-button {
+  height: 50px;
+  width: auto;
+}
+
+/* Canvas settings */
+.canvas {
+  padding: 10px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+
+/* Slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none; 
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 15px;
+  background: white;
+  border-radius: 16px;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 15px;
+  background: white;
+  border-radius: 16px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none; 
+  height: 15px;
+  width: 15px;
+  background-color: white;
+  border-radius: 50%;
+  border: 2px solid var(--icon-hover-color);
+  box-shadow: -407px 0 0 400px var(--icon-hover-color);
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 15px;
+  width: 15px;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid var(--icon-hover-color);
+  box-shadow: -407px 0 0 400px var(--icon-hover-color);
+}
+
+.canvas input[id="grid-slider"] {
+  margin-top: 5px;
+}
+
+.canvas #grid-slider::-webkit-slider-thumb {
+  background: var(--icon-hover-color);
+ }
+
+/* Checkbox */
 .canvas input[type="checkbox"] {
   aspect-ratio: 1 / 1;
   width: 20px;
@@ -438,7 +444,7 @@ input[type="range"]::-moz-range-thumb {
   transform: scale(1);
 }
 
-
+/* Drop down menu */
 .canvas select {
   width: 100%;
   position: relative;
@@ -462,6 +468,7 @@ input[type="range"]::-moz-range-thumb {
   width: auto;
 }
 
+/* Buttons */
 .settings-buttons {
   text-align: center;
 }
