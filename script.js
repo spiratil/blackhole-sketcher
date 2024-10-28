@@ -114,7 +114,6 @@ async function clearCanvas() {
 async function displayWipeLines(point, trailLines) {
   // Create the new lead line if it exists
   let leadLine = [];
-  console.log(point)
   for (let x = point[0], y = point[1]; x >= 1, y < grid.length; x--, y++) {
     if (grid[y][x] === 1) leadLine.push([x,y]);
   }

@@ -5,7 +5,7 @@
 
 /* Cell animations */
 @keyframes cell-hover-in {
-  from {background: var(--cell-color);}
+  from {background: var(--cell-color); box-shadow:  }
   to {background: var(--cell-hover-color);}
 }
 
@@ -16,13 +16,13 @@
 
 /* Icon animations */
 @keyframes icon-hover-in {
-  from {background: var(--icon-color);}
-  to {background: var(--icon-hover-color);}
+  from {transform: scale(0);}
+  to {transform: scale(1.1);}
 }
 
 @keyframes icon-hover-out {
-  from {background: var(--icon-hover-color);}
-  to {background: var(--icon-color);}
+  from {transform: scale(1.1);}
+  to {transform: scale(0);}
 }
 
 /* UI scaling animations */
@@ -180,11 +180,12 @@ h1 {
 #draw-tools {
   display: flex;
   justify-content: center;
+  gap: 10px;
 }
 
 #draw-tools .preset-colors {
   display: flex;
-  flex: 1 0 20%;
+  flex: 1 1 20%;
   justify-content: space-evenly;
   align-items: center;
   flex-direction: column;
@@ -192,14 +193,14 @@ h1 {
 }
 
 #draw-tools .mouse-selectors {
-  flex: auto;
-  margin: auto;
+  flex: 1 1 auto;
 }
 
 #draw-tools .mouse-selectors > * {
   text-align: center;
   max-width: 90%;
   margin: auto;
+  font-size: 1cqw;
 }
 
 /* color picker stylings */
@@ -207,7 +208,7 @@ h1 {
   padding: 0;
   appearance: none;
   border-radius: 100%;
-  box-shadow: rgba(0, 0, 0, 0.25) 0px 0px 5px 5px;
+  box-shadow: var(--icon-hover-color) 0px 0px 5px 5px;
   animation: scale-out 0.1s;
 }
 .color-picker:hover {
@@ -248,7 +249,7 @@ input[type="color"]::-webkit-color-swatch {
 
 #draw-tools .large-picker {
   aspect-ratio: 1 / 1;
-  width: 100%;
+  width: 90%;
   height: auto;
 }
 
@@ -256,7 +257,20 @@ input[type="color"]::-webkit-color-swatch {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  gap: 20px;
+  gap: 5%;
+  flex-wrap: wrap;
+}
+
+@media only screen and (min-width: 1600px) {
+  .tool-selection > div {
+    flex-basis: 20%;
+  }
+}
+
+@media only screen and (max-width: 1599px) {
+  .tool-selection > div {
+    flex-basis: 40%;
+  }
 }
 
 .tool-selection > div {
@@ -278,7 +292,7 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .icon ~ .icon-selected-background {
-  animation: icon-hover-out 0.1s;
+  animation: icon-hover-out 0.1s forwards;
 }
 
 .icon:hover ~ .icon-selected-background {
@@ -286,12 +300,14 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .icon-selected-background {
+  background-color: var(--icon-hover-color);
+  box-shadow: 0 0 10px 10px var(--icon-hover-color);
   border-radius: 50%;
-  width: 130%;
-  height: 130%;
+  width: 100%;
+  height: 100%;
   position: absolute;
-  top: -15%;
-  left: -15%;
+  top: 0;
+  left: 0;
   z-index: -1;
 }
 
@@ -369,14 +385,17 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: -407px 0 0 400px var(--icon-hover-color);
 }
 
+.canvas input[id="grid-slider"] {
+  margin-top: 5px;
+}
+
 .canvas #grid-slider::-webkit-slider-thumb {
   background: var(--icon-hover-color);
  }
 
-
-
 .canvas .canvas-options {
   display: flex;
+  gap: 5px;
   flex-direction: column;
   flex: 1 1 30%;
   text-align: center;
@@ -392,14 +411,50 @@ input[type="range"]::-moz-range-thumb {
   margin: auto;
 }
 
-.canvas #grid-checkbox {
+.canvas input[type="checkbox"] {
   aspect-ratio: 1 / 1;
   width: 20px;
+  appearance: none;
+  background-color: white;
+  font: inherit;
+  color: currentColor;
+  border: 2px solid currentColor;
+  border-radius: 5px;
+  transform: translateY(-0.075em);
+  display: grid;
+  place-content: center;
 }
 
-.canvas .canvas-options select {
-  width: 75%;
+.canvas input[type="checkbox"]::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 18px 18px var(--icon-hover-color);
+}
+
+.canvas input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+
+.canvas select {
+  width: 100%;
+  position: relative;
+  appearance: none;
+  font-size: 0.7cqw;
+  background-color: #fff;
+  border: 1px solid white;
+  border-radius: 0.25rem;
+  font-family: inherit;
+  color: var(--second-font-color);
+  background-image: url(./imgs/menu-expand.png);
+  background-repeat:  no-repeat;
+  background-size: 7px 7px;
+  background-position: calc(100% - 7px) calc(50% + 1px);
   margin: auto;
+
 }
 
 .canvas input[type="color"] {
@@ -417,6 +472,8 @@ input[type="range"]::-moz-range-thumb {
 
 .settings-buttons button:hover {
   animation: scale-in 0.1s forwards;
+  background-color: var(--icon-hover-color);
+  box-shadow: var(--icon-hover-color) 0px 0px 5px 5px;
 }
 
 .settings-buttons button {
