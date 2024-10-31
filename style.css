@@ -1,3 +1,27 @@
+:root {
+  --border-curve: 25px;
+  --cell-size: 0px;
+  --cell-animate-in: cell-hover-in;
+  --cell-animate-out: cell-hover-out;
+  --cell-color: black;
+  --cell-hover-color: dimgrey;
+  --content-area-width: 120vw; /*Initial value on site load only*/
+  --content-area-height: "";
+  --font-color-main: white;
+  --font-color-second: black;
+  --greyscale-color: linear-gradient(to bottom right, white 20%, black, dimgrey, lightgrey, grey, black, lightgrey, darkgrey, dimgrey, lightgrey, black 80%);
+  --grid-color: white;
+  --grid-line-type: none;
+  --icon-color: rgba(0, 0, 0, 0);
+  --icon-hover-color: rgba(105, 150, 219);
+  --icon-selected-color: rgba(255, 0, 255);
+  --leading-line-color: rgba(105, 150, 219);
+  --panel-background-color: rgba(105, 150, 219, 0.65);
+  --rainbow-color: linear-gradient(to bottom right, red 20%, orange, yellow, green, blue, indigo, violet 80%);
+  --trail-line-one-color: rgba(52, 75, 110);
+  --trail-line-two-color: rgba(26, 37, 55);
+}
+
 @font-face {
   font-family: 'Audiowide';
   src: url('./font/Audiowide-Regular.ttf') format('truetype');
@@ -42,23 +66,6 @@
   100% {transform: translate(-50%, -50%) rotate(360deg);}
 }
 
-:root {
-  --content-area-width: 120vw; /*Initial value on site load only*/
-  --content-area-height: "";
-  --main-font-color: white;
-  --second-font-color: black;
-  --panel-background-color: rgba(105, 150, 219, 0.65);
-  --border-curve: 25px;
-  --cell-size: 0px;
-  --cell-color: black;
-  --cell-hover-color: dimgrey;
-  --leading-line-color: rgba(105, 150, 219);
-  --trail-line-one-color: rgba(52, 75, 110);
-  --trail-line-two-color: rgba(26, 37, 55);
-  --icon-color: rgba(0, 0, 0, 0);
-  --icon-hover-color: rgba(105, 150, 219);
-}
-
 .selectable {
   cursor: pointer;
 }
@@ -67,7 +74,7 @@ body {
   background: #121929;
   margin: 0;
   height: 100vh;
-  color: var(--main-font-color);
+  color: var(--font-color-main);
   font-family: 'Audiowide', Arial, Helvetica, sans-serif;
 }
 
@@ -85,7 +92,7 @@ body {
 }
 
 a {
-  color: var(--second-font-color);
+  color: var(--font-color-second);
 }
 
 header {
@@ -137,11 +144,18 @@ h2 {
   background: var(--cell-color);
   width: var(--cell-size);
   height: var(--cell-size);
-  animation: cell-hover-out 1s;
 }
 
-.cells-container .cell:hover {
-  animation: cell-hover-in 0.1s forwards;
+.cells-container .cell:not(.disable-hover) {
+  animation: var(--cell-animate-out) 1s;
+}
+
+.cells-container .cell {
+  border: 1px var(--grid-color) var(--grid-line-type);
+}
+
+.cells-container .cell:not(.disable-hover):hover {
+  animation: var(--cell-animate-in) 0.1s forwards;
 }
 
 .cells-container .row .leading-line {
@@ -196,7 +210,7 @@ h2 {
   justify-content: space-evenly;
   align-items: center;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
 }
 
 #draw-tools .mouse-selectors {
@@ -205,7 +219,7 @@ h2 {
 
 #draw-tools .mouse-selectors > * {
   text-align: center;
-  max-width: 90%;
+  max-width: 80%;
   margin: auto;
   font-size: 1cqw;
 }
@@ -221,6 +235,12 @@ h2 {
 .color-picker:hover {
   animation: scale-in 0.1s forwards;
 }
+
+.hidden-picker {
+  display: none;
+  margin: auto;
+}
+
 input[type="color"] {
   -webkit-appearance: none;
   border: none;
@@ -243,13 +263,13 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 #draw-tools .preset-colors #default-color {
-  background: linear-gradient(to bottom right, black 45%, white 55%);
+  background: linear-gradient(to bottom right, white 45%, dimgrey 55%);
 }
 #draw-tools .preset-colors #rainbow-color {
-  background-image: linear-gradient(to bottom right, red 20%, orange, yellow, green, blue, indigo, violet 80%);
+  background-image: var(--rainbow-color);
 }
 #draw-tools .preset-colors #greyscale-color {
-  background: linear-gradient(to bottom right, white 20%, black, dimgrey, lightgrey, grey, black, lightgrey, darkgrey, dimgrey, lightgrey, black 80%);
+  background: var(--greyscale-color);
 }
 #draw-tools .preset-colors #custom-color {
   background-image: linear-gradient(to bottom right, white 45%, red, white 55%);
@@ -259,6 +279,10 @@ input[type="color"]::-webkit-color-swatch {
   aspect-ratio: 1 / 1;
   width: 90%;
   height: auto;
+}
+
+#draw-tools #left-mouse-color .color-picker {
+  margin-bottom: 10px;
 }
 
 /* Tool selection icons in the left panel */
@@ -292,25 +316,37 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 /* Icons */
-.icon, .icon ~ .icon-selected-background {
+.icon, .icon ~ .icon-hover {
   animation: scale-out 0.1s;
 }
 
-.icon:hover, .icon:hover ~ .icon-selected-background {
+.icon:hover, .icon:hover ~ .icon-hover {
   animation: scale-in 0.1s forwards;
 }
 
-.icon ~ .icon-selected-background {
+.icon ~ .icon-hover {
   animation: icon-hover-out 0.1s forwards;
 }
 
-.icon:hover ~ .icon-selected-background {
+.icon:hover ~ .icon-hover {
   animation: icon-hover-in 0.1s forwards;
 }
 
-.icon-selected-background {
+.icon-hover {
   background-color: var(--icon-hover-color);
   box-shadow: 0 0 10px 10px var(--icon-hover-color);
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.selected {
+  background-color: var(--icon-selected-color);
+  box-shadow: 0 0 10px 10px var(--icon-selected-color);
   border-radius: 50%;
   width: 100%;
   height: 100%;
@@ -366,6 +402,18 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 /* Slider */
+.canvas .canvas-size {
+  width: 100%;
+  display: inline-block;
+  position: relative;
+}
+
+.canvas .canvas-size .info-total-cells {
+  display: inline-block;
+  position: absolute;
+  right: 0;
+}
+
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none; 
@@ -454,7 +502,7 @@ input[type="range"]::-moz-range-thumb {
   border: 1px solid white;
   border-radius: 0.25rem;
   font-family: inherit;
-  color: var(--second-font-color);
+  color: var(--font-color-second);
   background-image: url(./imgs/menu-expand.png);
   background-repeat:  no-repeat;
   background-size: 7px 7px;

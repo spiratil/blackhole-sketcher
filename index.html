@@ -21,36 +21,37 @@
               <div id="default-color" class="color-picker small-picker selectable"></div>
               <div id="rainbow-color" class="color-picker small-picker selectable"></div>
               <div id="greyscale-color" class="color-picker small-picker selectable"></div>
-              <div id="custom-color" class="color-picker small-picker selectable"></div>
             </div>
             <div class="mouse-selectors">
               <div id="left-mouse-color">
-                <div class="color-hex">#000000</div>
-                <input class="color-picker large-picker selectable" type="color" value="#000000"></input>
+                <div class="color-hex"></div>
+                <input class="color-picker large-picker selectable" type="color"></input>
+                <div class="color-picker large-picker hidden-picker selectable"></div>
               </div>
               <div id="right-mouse-color">
-                <input class="color-picker large-picker selectable" type="color" value="#FFFFFF"></input>
-                <div class="color-hex right-color">#FFFFFF</div>
+                <div class="color-picker large-picker hidden-picker selectable"></div>
+                <input class="color-picker large-picker selectable" type="color"></input>
+                <div class="color-hex right-color"></div>
               </div>
             </div class="color-profiles">
           </div>
         </div>
         <div class="tool-selection">
           <div>
-            <img class="icon selectable" src="./imgs/draw-icon.png" alt="draw tool">
-            <div class="icon-selected-background"></div>
+            <img id="draw-select" class="icon selectable" src="./imgs/draw-icon.png" alt="draw tool">
+            <div class="icon-hover"></div>
           </div>
           <div>
-            <img class="icon selectable" src="./imgs/erase-icon.png" alt="erase tool">
-            <div class="icon-selected-background"></div>
+            <img id="erase-select" class="icon selectable" src="./imgs/erase-icon.png" alt="erase tool">
+            <div class="icon-hover"></div>
           </div>
           <div>
-            <img class="icon selectable" src="./imgs/line-icon.png" alt="line tool">
-            <div class="icon-selected-background"></div>
+            <img id="line-select" class="icon selectable" src="./imgs/line-icon.png" alt="line tool">
+            <div class="icon-hover"></div>
           </div>
           <div>
-            <img class="icon selectable" src="./imgs/move-icon.png" alt="move tool">
-            <div class="icon-selected-background"></div>
+            <img id="move-select" class="icon selectable" src="./imgs/move-icon.png" alt="move tool">
+            <div class="icon-hover"></div>
           </div>
         </div>
       </div>
@@ -59,18 +60,33 @@
         <div id="history">
           <div id="undo-button">
             <img class="icon history-button selectable" src="./imgs/undo-icon.png" alt="undo last action">
-            <div class="icon-selected-background"></div>
+            <div class="icon-hover"></div>
           </div>
           <div id="redo-button">
             <img class="icon history-button selectable" src="./imgs/redo-icon.png" alt="redo last action">
-            <div class="icon-selected-background"></div>
+            <div class="icon-hover"></div>
           </div>
         </div>
         <div class="canvas">
           <h2>Canvas Options</h2>
           <div class="canvas-size">
             <label for="canvas-size">Canvas Size: <span class="info-total-cells"></span></label>
-            <input id="grid-slider" class="selectable" type="range" name="canvas-size" min="1" max="100" value="50">
+            <input id="grid-slider" class="selectable" type="range" name="canvas-size">
+          </div>
+          <div class="canvas-options">
+            <label for="canvas-color"><pre>Canvas
+Colour:</pre></label>
+            <input id="canvas-color" class="selectable color-picker" type="color" name="canvas-color">
+          </div>
+          <div class="canvas-options">
+            <label for="hover-checkbox"><pre>Hover
+Trail:</pre></label>
+            <input id="hover-checkbox" class="selectable" type="checkbox" name="hover-checkbox" value="show">
+          </div>
+          <div class="canvas-options">
+            <label for="hover-color"><pre>Hover
+Colour:</pre></label>
+            <input id="hover-color" class="selectable color-picker" type="color" name="hover-color">
           </div>
           <div class="canvas-options">
             <label for="show-grid"><pre>Show
@@ -88,24 +104,14 @@ Line:</pre></label>
           </div>
           <div class="canvas-options">
             <label for="grid-color"><pre>Grid
-Size:</pre></label>
-            <input id="grid-color" class="selectable color-picker" type="color" name="grid-color" value="#696969">
-          </div>
-          <div class="canvas-options">
-            <label for="canvas-color"><pre>Canvas
 Colour:</pre></label>
-            <input id="canvas-color" class="selectable color-picker" type="color" name="canvas-color" value="#000000">
-          </div>
-          <div class="canvas-options">
-            <label for="hover-color"><pre>Hover
-Colour:</pre></label>
-            <input id="hover-color" class="selectable color-picker" type="color" name="hover-color" value="#696969">
+            <input id="grid-color" class="selectable color-picker" type="color" name="grid-color">
           </div>
         </div>
         <div class="settings-buttons">
           <h2>App Options</h2>
           <div>
-            <button id="clear-button">Clear All</button>
+            <button id="clear-button">Clear Canvas</button>
           </div>
           <button id="random-color-button">Rainbow Fill</button>
           <button id="random-greyscale-button">Greyscale Fill</button>
