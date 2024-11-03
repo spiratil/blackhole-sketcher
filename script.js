@@ -6,7 +6,7 @@ const cellsCon = document.querySelector('.cells-container');
 const controls = document.querySelectorAll('.controls');
 const footer = document.querySelector('footer');
 
-// Global variables
+// Global variables and Closure Functions
 const ratio = 5 / 18; // Ratio of the blackhole cells to the total image dimension cells
 let grid; // Contains color for each cell on the sketcher
 let gridParams;
@@ -15,9 +15,24 @@ let history = {
   step: 0
 };
 let selectedTool = 'draw';
-let toolMode = 'default';
 let isToolActive = false;
-let toolColor;
+let toolColorMode = 'default';
+let lastMouseBtn;
+let drawLineCoords;
+let moveCellCoords;
+
+function getToolColor(isCanvasColor = false) {
+  if (isCanvasColor) return '';
+
+  else if (toolColorMode == 'default') // Color of the mouse button clicked
+    return document.querySelector(`#${lastMouseBtn}-mouse-color input`).value;
+
+  else if (toolColorMode == 'rainbow') // Random hex colour
+    return '#' + Math.floor(Math.random()*Math.pow(256,3)).toString(16).padStart(6,'0'); 
+
+    else if (toolColorMode == 'greyscale') // Random greyscale hex colour
+    return '#' + Math.floor(Math.random()*256).toString(16).padStart(2,'0').repeat(3);
+}
 
 // Sleep function
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -32,6 +47,8 @@ document.querySelector('#grid-color').addEventListener('change', showHideGrid);
 document.querySelector('#canvas-color').addEventListener('change', e => cssVars.style.setProperty('--cell-color', e.target.value));
 document.querySelector('#hover-checkbox').addEventListener('change', showHideHover);
 document.querySelector('#hover-color').addEventListener('change', e => cssVars.style.setProperty('--cell-hover-color', e.target.value));
+document.querySelector('#left-mouse-color input').addEventListener('change', updateDefaultColors)
+document.querySelector('#right-mouse-color input').addEventListener('change', updateDefaultColors)
 
 // Cell interaction event listeners
 document.querySelector('.cells-container').addEventListener('mousedown', initiateToolAction);
@@ -40,8 +57,10 @@ document.querySelector('.cells-container').addEventListener('contextmenu', e => 
 // Turn off auto fill when mouse button is lifted
 window.addEventListener('mouseup', () => {
   if (isToolActive) {
-    isToolActive = false
-    recordHistory();
+    if (selectedTool != 'line' && selectedTool != 'move') {
+      isToolActive = false
+      recordHistory();
+    }
   }
 }); 
 
@@ -70,7 +89,7 @@ function initialiseApp() {
   document.querySelector('#right-mouse-color').children[2].innerText = '#696969';
 
   // Small colour pickers
-  document.querySelector('.preset-colors').addEventListener('click', setDefaultColor);
+  document.querySelector('.preset-colors').addEventListener('click', setDrawColor);
 
   // Tools
   document.querySelector('#draw-select').nextElementSibling.classList.remove('icon-hover');
@@ -85,28 +104,29 @@ function initialiseApp() {
   createNewCanvas(true);
 }
 
-function setDefaultColor(e) {
+function setDrawColor(e) {
   let leftPicker = document.querySelector('#left-mouse-color');
   let rightPicker = document.querySelector('#right-mouse-color');
-  console.log(cssVars.getAttribute('--rainbow-color'))
   switch (e.target.id) {
     case 'default-color':
-      toolMode = 'default'
-      leftPicker.children[0].innerText = '#FFFFFF';
+      toolColorMode = 'default'
+      const isAlreadyDefault = document.querySelector('#default-color').style.background == '' ? true : false;
+
+      leftPicker.children[0].innerText = isAlreadyDefault ? '#FFFFFF' : document.querySelector('#left-mouse-color input').value.toUpperCase();
       leftPicker.children[0].style.fontSize = '1cqw';
       leftPicker.children[0].style.margin = 0;
-      leftPicker.children[1].value = '#FFFFFF';
+      leftPicker.children[1].value = isAlreadyDefault ? '#FFFFFF' : document.querySelector('#left-mouse-color input').value;
       leftPicker.children[1].style.display = 'inline-block';
       leftPicker.children[2].style.display = 'none';
       rightPicker.children[0].style.display = 'none';
-      rightPicker.children[1].value = '#696969';
+      rightPicker.children[1].value = isAlreadyDefault ? '#696969' : document.querySelector('#right-mouse-color input').value;
       rightPicker.children[1].style.display = 'inline-block';
-      rightPicker.children[2].innerText = '#696969';
+      rightPicker.children[2].innerText = isAlreadyDefault ? '#696969' : document.querySelector('#right-mouse-color input').value.toUpperCase();
       rightPicker.children[2].style.fontSize = '1cqw';
       rightPicker.children[2].style.margin = 0;
       break;
     case 'rainbow-color':
-      toolMode = 'rainbow';
+      toolColorMode = 'rainbow';
       leftPicker.children[0].innerText = 'RAINBOW';
       leftPicker.children[0].style.fontSize = '0.9484cqw';
       leftPicker.children[0].style.margin = 0;
@@ -121,7 +141,7 @@ function setDefaultColor(e) {
       rightPicker.children[2].style.margin = 0;
       break;
     case 'greyscale-color':
-      toolMode = 'greyscale';
+      toolColorMode = 'greyscale';
       leftPicker.children[0].innerText = 'GREYSCALE';
       leftPicker.children[0].style.fontSize = '0.66cqw';
       leftPicker.children[0].style.margin = '5px';
@@ -196,53 +216,239 @@ function initiateToolAction(e) {
   try {
     cell = document.querySelector(`.cell[data-coordinate="${e.target.attributes[1].value}"]`);
   }
-  catch { return }
+  catch { return; }
+
+  lastMouseBtn = e.button === 0 ? 'left'
+    : e.button === 2 ? 'right'
+    : null;
 
   switch (selectedTool) {
     case 'draw':
       isToolActive = true;
-
-      // Set the color fill to the current mouse being used
-      if (toolMode == 'default') {
-        if (e.button === 0) toolColor = document.querySelector('#left-mouse-color').children[1].value;
-        else if (e.button === 2) toolColor = document.querySelector('#right-mouse-color').children[1].value;
-      }
-      else if (toolMode == 'rainbow') toolColor = '#' + Math.floor(Math.random()*Math.pow(256,3)).toString(16).padStart(6,'0'); // Random hex colour
-      else if (toolMode == 'greyscale') toolColor = '#' + Math.floor(Math.random()*256).toString(16).padStart(2,'0').repeat(3); // Random greyscale hex colour
-
-      recordHistory(e.target.attributes[1].value);
-
-      // Fill in the cell
-      cell.classList.add('disable-hover');
-      cell.style.background = toolColor;
+      recordHistory(e.target.attributes[1].value, getToolColor(), 'disable');
+      fillCell(cell, getToolColor(), 'disable');
       break;
-    default:
-  }
+    case 'erase':
+      isToolActive = true;
+      if (!e.target.style.background || e.target.style.background == document.querySelector('#canvas-color').value) return;
+      recordHistory(e.target.attributes[1].value, getToolColor(true), 'enable');
+      fillCell(cell, getToolColor(true), 'enable');
+      break;
+    case 'line':
+      if (!lastMouseBtn) return;
+        
+      // Initiate the line if not already active
+      if (!isToolActive) {
+        isToolActive = true;
+
+        const mouseCoord = e.target.dataset.coordinate;
+        drawLineCoords = {
+          origin: mouseCoord, // Initial coordinate of mouse click
+          cells: {[mouseCoord]: setCellRecord(mouseCoord)},
+        };
+
+        fillCell(cell, getToolColor(), 'disable');
+      }
+      else {
+        for (const coord of Object.keys(drawLineCoords.cells))
+          recordHistory(coord, '', '', true);
+        isToolActive = false;
+        recordHistory(); // End the current history log
+      }
+      break;
+    case 'move':
+      // Activate the tool if not already
+      if (!isToolActive) {
+        isToolActive = true;  
+        
+        const cellCoord = e.target.attributes[1].value;
+        const origin = document.querySelector(`.cell[data-coordinate="${cellCoord}"`);
+        const isCanvasColor = origin.style.background == '';
+
+        moveCellCoords = {
+          origin: {
+            coord: cellCoord,
+            ...setCellRecord(cellCoord, isCanvasColor)
+          },
+          target: {
+            coord: cellCoord,
+            ...setCellRecord(cellCoord, isCanvasColor)
+          } 
+        };
+
+        // Add opacity and a border to the cell being moved
+        if (e.target.style.background !== '') {
+          const rgb = e.target.style.background.match(/\d+/g).map(Number);
+          fillCell(origin, `rgba(${rgb.join(',')}, 0.65)`, 'disable', `solid 2px ${document.querySelector('#grid-color').value}`);
+        }
+        else fillCell(origin, getToolColor(true), 'disable', `solid 2px ${document.querySelector('#grid-color').value}`);
+      }
+      // Finalise moving the cell to the new location
+      else {
+        // Return the cells to their original state so that the history can be recorder correctly
+        const origin = document.querySelector(`.cell[data-coordinate="${moveCellCoords.origin.coord}"]`);
+        fillCell(origin, moveCellCoords.origin.oldColor, moveCellCoords.origin.oldHover);
+        const newCell = document.querySelector(`.cell[data-coordinate="${moveCellCoords.target.coord}"]`);
+        fillCell(newCell, moveCellCoords.target.oldColor, moveCellCoords.target.oldHover);
+
+        // Don't record history if the origin is not moved to another cell
+        if (moveCellCoords.origin.coord != moveCellCoords.target.coord) {
+          recordHistory(moveCellCoords.origin.coord, getToolColor(true), 'enable');
+          recordHistory(moveCellCoords.target.coord, moveCellCoords.origin.oldColor, moveCellCoords.origin.oldHover);
+        }
+
+        // Set the new cell states
+        fillCell(origin, getToolColor(true), 'enable');
+        fillCell(newCell, moveCellCoords.origin.oldColor, moveCellCoords.origin.oldHover);
+
+        isToolActive = false;
+        if (moveCellCoords.origin.coord != moveCellCoords.target.coord) recordHistory();
+      }
+      break;
+    }
 }
 
 function continueToolAction(e) {
   if (!isToolActive) return;
 
+  // Return if the mouse moves outside of the cells range
+  let cell;  
+  try {
+    cell = document.querySelector(`.cell[data-coordinate="${e.target.attributes[1].value}"]`);
+  }
+  catch { return; }
+
   switch (selectedTool) {
     case 'draw':
-      let cell;  
-      try {
-        cell = document.querySelector(`.cell[data-coordinate="${e.target.attributes[1].value}"]`);
+      recordHistory(e.target.attributes[1].value, getToolColor(), 'disable');
+      fillCell(cell, getToolColor(), 'disable');
+      break;
+    case 'erase':
+      recordHistory(e.target.attributes[1].value, getToolColor(true), 'enable');
+      fillCell(cell, getToolColor(true), 'enable');
+      break;
+    case 'line':
+      // Remove the previous line drawn
+      for (const [key, point] of Object.entries(drawLineCoords.cells)) {
+        if (drawLineCoords.origin == key) { // Skip the origin coordinate
+          fillCell(document.querySelector(`.cell[data-coordinate="${drawLineCoords.origin}"]`), getToolColor(), 'disable');
+          continue;
+        }
+
+        fillCell(document.querySelector(`.cell[data-coordinate="${key}"]`), point.oldColor, point.oldHover);
+        delete drawLineCoords.cells[key]; // Remove the old line coordinate
       }
-      catch { return }
 
-      if (toolMode == 'rainbow') toolColor = '#' + Math.floor(Math.random()*Math.pow(256,3)).toString(16).padStart(6,'0'); // Random hex colour
-      else if (toolMode == 'greyscale') toolColor = '#' + Math.floor(Math.random()*256).toString(16).padStart(2,'0').repeat(3); // Random greyscale hex colour
+      // Determine the distance between the origin and mouse pointer along the x and y axis
+      let mouseCoord = e.target.dataset.coordinate.split('-').map(Number);
+      let origin = drawLineCoords.origin.split('-').map(Number);
+      let xLength = mouseCoord[0] - origin[0];
+      let yLength = mouseCoord[1] - origin[1];
 
-      recordHistory(e.target.attributes[1].value);
+      // The line is dynamically drawn based on the smallest x or y step. dx and dy represent the smallest
+      // step alone the line's slope
+      let dx, dy;
+      if (Math.abs(xLength) > Math.abs(yLength)) {
+        dx = Math.sign(xLength) * Math.abs(xLength / (yLength === 0 ? 1 : yLength));
+        dy = Math.sign(yLength);
+      }
+      else if (Math.abs(yLength) > Math.abs(xLength)) {
+        dx = Math.sign(xLength);
+        dy = Math.sign(yLength) * Math.abs(yLength / (xLength === 0 ? 1 : xLength));
+      }
+      else {
+        dx = Math.sign(xLength);
+        dy = Math.sign(yLength);
+      }
 
-      // Fill in the cell
-      cell.classList.add('disable-hover');
-      cell.style.background = toolColor;
+      let ittCount;
+      if (Math.abs(dx) === 0 || Math.abs(dy) === 0) ittCount = 1; // If x or y equal 0, set to 1 so that the iteration does not immediately end
+      else ittCount = Math.abs(dx) <= Math.abs(dy) ? Math.abs(xLength) : Math.abs(yLength); // Set the number of iterations to the smallest x or y step
+      
+      let prevPoint = origin; // The point calculated in the previous iteration
+      for (let i = 1; i <= ittCount; i++) {
+        let newX = origin[0] + Math.ceil(i * dx);
+        let newY = origin[1] + Math.ceil(i * dy);
+        drawLineCoords.cells[`${newX}-${newY}`] = setCellRecord(`${newX}-${newY}`); // Add the new point
+        fillCell(document.querySelector(`.cell[data-coordinate="${newX}-${newY}"]`), getToolColor(), 'disable');
+
+        // The number of x and y steps between the previous point and the new point
+        let gapY = Math.abs(newY - prevPoint[1]);
+        let gapX = Math.abs(newX - prevPoint[0]); 
+
+        // Fill in the missing gaps between points for when dx or dy is larger than the base step
+        if (gapX > 1) {
+          for (let j = 1; j < gapX; j++) {
+            let newX = prevPoint[0] + j * Math.sign(dx);
+            drawLineCoords.cells[`${newX}-${newY}`] = setCellRecord(`${newX}-${newY}`); // Add the new point
+            fillCell(document.querySelector(`.cell[data-coordinate="${newX}-${newY}"]`), getToolColor(), 'disable');
+          }
+        }
+        else if (gapY > 1) {
+          for (let j = 1; j < gapY; j++) {
+            let newY = prevPoint[1] + j * Math.sign(dy);
+            drawLineCoords.cells[`${newX}-${newY}`] = setCellRecord(`${newX}-${newY}`); // Add the new point
+            fillCell(document.querySelector(`.cell[data-coordinate="${newX}-${newY}"]`), getToolColor(), 'disable');
+          }
+        }
+
+        prevPoint = [newX, newY];
+      }
+      break;
+    case 'move':
+      // Restore the old cell to its original state once the mouse moves to a new cell
+      const oldCell = document.querySelector(`.cell[data-coordinate="${moveCellCoords.target.coord}"]`);
+      if (moveCellCoords.target.coord != moveCellCoords.origin.coord)
+        fillCell(oldCell, moveCellCoords.target.oldColor, moveCellCoords.target.oldHover);
+      // If the mouse hovers over and then moves away from the origin, restore it to a faded background afterwards
+      else {
+        if (oldCell.style.background !== '') {
+          const rgb = oldCell.style.background.match(/\d+/g).map(Number);
+          fillCell(oldCell, `rgba(${rgb.join(',')}, 0.65)`, 'disable', `solid 2px ${document.querySelector('#grid-color').value}`);
+        }
+        else fillCell(oldCell, getToolColor(true), 'disable', `solid 2px ${document.querySelector('#grid-color').value}`);
+      }
+
+      // Save the new cells current state
+      moveCellCoords.target.coord = e.target.attributes[1].value;
+      moveCellCoords.target.oldColor = newCell.style.background;
+      moveCellCoords.target.oldHover = newCell.classList.contains('disable-hover') ? 'disable' : 'enable';
+
+      // Set the new cell to mimic the origin
+      const newCell = document.querySelector(`.cell[data-coordinate="${moveCellCoords.target.coord}"]`);
+      newCell.style.background = moveCellCoords.origin.oldColor;
+      newCell.style.border = `solid 2px ${document.querySelector('#grid-color').value}`;
+      if (moveCellCoords.target.oldHover == 'enable') newCell.classList.add('disable-hover');
+      
+      break;
   }
 }
 
-function recordHistory(coord) {
+// Updates the default color picker colors on changes to the mouse colors
+function updateDefaultColors(e) {
+  const leftColor = document.querySelector('#left-mouse-color input').value;
+  document.querySelector('#left-mouse-color').children[0].innerText = leftColor.toUpperCase();
+  const rightColor = document.querySelector('#right-mouse-color input').value;
+  document.querySelector('#right-mouse-color').children[2].innerText = rightColor.toUpperCase();
+  document.querySelector('#default-color').style.background = `linear-gradient(to bottom right, ${leftColor} 45%, ${rightColor} 55%)`;
+}
+
+function fillCell(cell, color, enableHover, border) {
+  enableHover == 'enable' ? cell.classList.remove('disable-hover') : cell.classList.add('disable-hover');
+  cell.style.background = color;
+  border ? cell.style.border = border : cell.style.border = '';
+}
+
+function setCellRecord(coord, isCanvasColor = false) {
+  return {
+    newColor: getToolColor(isCanvasColor),
+    oldColor: document.querySelector(`.cell[data-coordinate="${coord}"]`).style.background,
+    newHover: isCanvasColor ? 'enable' : 'disable',
+    oldHover: document.querySelector(`.cell[data-coordinate="${coord}"]`).classList.contains('disable-hover') ? 'disable' : 'enable'
+  };
+}
+
+function recordHistory(coord, color, hover, lineEntry = false) {
   if (isToolActive) {
     // Delete redo history if it exists
     if (history.step !== 0) {
@@ -251,12 +457,23 @@ function recordHistory(coord) {
       history.step = 0;
     }
 
-    // Add to the current history step
     if (Object.hasOwn(history.prevStep[0], coord)) return;
-    history.prevStep[0][coord] = {
-      new: toolColor,
-      old: document.querySelector(`.cell[data-coordinate="${coord}"]`).style.background
-    };
+    if (lineEntry) { // Add the drawn line to the history record
+      history.prevStep[0][coord] = {
+        newColor: drawLineCoords.cells[coord].newColor,
+        oldColor: drawLineCoords.cells[coord].oldColor,
+        newHover: drawLineCoords.cells[coord].newHover,
+        oldHover: drawLineCoords.cells[coord].oldHover
+      };
+    }
+    else { // Add drawing, erasing and moving to the history record
+      history.prevStep[0][coord] = {
+        newColor: color,
+        oldColor: document.querySelector(`.cell[data-coordinate="${coord}"]`).style.background,
+        newHover: hover,
+        oldHover: document.querySelector(`.cell[data-coordinate="${coord}"]`).classList.contains('disable-hover') ? 'disable' : 'enable'
+      };
+    }
   }
   else history.prevStep.unshift({});
 }
@@ -266,8 +483,9 @@ function undoAction() {
     history.step++;
 
     for (const [key, value] of Object.entries(history.prevStep[history.step])) {
-      document.querySelector(`.cell[data-coordinate="${key}"]`).style.background = value.old;
-      if (value.old === 'none') document.querySelector(`.cell[data-coordinate="${key}"]`).classList.remove('disable-hover');
+      document.querySelector(`.cell[data-coordinate="${key}"]`).style.background = value.oldColor;
+      if (value.oldHover == 'enable') document.querySelector(`.cell[data-coordinate="${key}"]`).classList.remove('disable-hover');
+      else document.querySelector(`.cell[data-coordinate="${key}"]`).classList.add('disable-hover');
     }
   }
 
@@ -277,8 +495,9 @@ function undoAction() {
 function redoAction() {
   if (history.step > 0) {
     for (const [key, value] of Object.entries(history.prevStep[history.step])) {
-      document.querySelector(`.cell[data-coordinate="${key}"]`).classList.add('disable-hover');
-      document.querySelector(`.cell[data-coordinate="${key}"]`).style.background = value.new;
+      if (value.newHover == 'enable') document.querySelector(`.cell[data-coordinate="${key}"]`).classList.remove('disable-hover');
+      else document.querySelector(`.cell[data-coordinate="${key}"]`).classList.add('disable-hover');
+      document.querySelector(`.cell[data-coordinate="${key}"]`).style.background = value.newColor;
     }
 
     history.step--;
