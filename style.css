@@ -5,7 +5,7 @@
   --cell-animate-out: undefined;
   --cell-color: black;
   --cell-hover-color: dimgrey;
-  --content-area-width: 120vw; /*Initial value on site load only*/
+  --content-area-width: ""; /*Initial value on site load only*/
   --content-area-height: "";
   --font-color-main: white;
   --font-color-second: black;
@@ -14,7 +14,7 @@
   --grid-line-type: none;
   --icon-color: rgba(0, 0, 0, 0);
   --icon-hover-color: rgba(105, 150, 219);
-  --icon-selected-color: rgba(255, 0, 255);
+  --icon-selected-color: rgba(200, 200, 200);
   --leading-line-color: rgba(105, 150, 219);
   --panel-background-color: rgba(105, 150, 219, 0.65);
   --rainbow-color: linear-gradient(to bottom right, red 20%, orange, yellow, green, blue, indigo, violet 80%);
@@ -80,11 +80,11 @@ body {
 
 .background {
   position: fixed;
-  min-width: 100%;
+  /*min-width: 100%;
   min-height: 100%;
+  object-fit: cover;*/
   width: var(--content-area-width);
   height: var(--content-area-height);
-  object-fit: cover;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) rotate(0deg);
@@ -357,6 +357,20 @@ input[type="color"]::-webkit-color-swatch {
 }
 
  /* Right panel positioning */
+@media only screen and (max-height: 799px) {
+  .content .right-control > * {
+    padding: 2px 20px;
+  }
+
+  .content .right-control .settings-buttons {
+    padding: 2px 5px 10px 5px;
+  }
+
+  .content .right-control .settings-buttons button {
+    font-size: 0.7cqw;
+  }
+}
+
  .canvas .canvas-options {
   display: flex;
   gap: 5px;
@@ -364,6 +378,7 @@ input[type="color"]::-webkit-color-swatch {
   flex: 1 1 30%;
   text-align: center;
   align-self: stretch;
+  font-size: 0.9cqw;
 }
 
 .canvas .canvas-options pre {
@@ -404,8 +419,12 @@ input[type="color"]::-webkit-color-swatch {
 /* Slider */
 .canvas .canvas-size {
   width: 100%;
-  display: inline-block;
   position: relative;
+}
+
+.canvas .canvas-size label {
+  display: block;
+  font-size: 0.9cqw;
 }
 
 .canvas .canvas-size .info-total-cells {
@@ -417,7 +436,7 @@ input[type="color"]::-webkit-color-swatch {
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none; 
-  width: 100%;
+  width: 99%;
   cursor: pointer;
   outline: none;
   overflow: hidden;
@@ -522,6 +541,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .settings-buttons button {
+  font-size: 0.9cqw;
   animation: scale-out 0.1s;
 }
 

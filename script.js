@@ -1,21 +1,16 @@
-// Document elements
+// Styling variables
 const cssVars = document.querySelector(':root');
-const bgImg = document.querySelector('.background');
-const header = document.querySelector('header');
-const cellsCon = document.querySelector('.cells-container');
-const controls = document.querySelectorAll('.controls');
-const footer = document.querySelector('footer');
 
 //************************************************** */
 // Color management closure function
 //************************************************** */
-const color = (() => {
-  const color = {
+const colors = (() => {
+  const colors = {
     active: (override) => {
       // If override is provided, ignore the set color mode
-      if (color.mode == 'standard' && !override || override == 'standard') return standard();
-      if (color.mode == 'greyscale' && !override || override == 'greyscale') return greyscale();
-      if (color.mode == 'rainbow' && !override || override == 'rainbow') return rainbow();
+      if (colors.mode == 'standard' && !override || override == 'standard') return standard();
+      if (colors.mode == 'greyscale' && !override || override == 'greyscale') return greyscale();
+      if (colors.mode == 'rainbow' && !override || override == 'rainbow') return rainbow();
     },
     canvas: '',
     grid: '#696969',
@@ -23,16 +18,28 @@ const color = (() => {
     mode: 'standard'
   };
 
-  // Initial settings for page load
-  setColorMode('default-color');
-
   // Colour generating functions
   const greyscale = () => '#' + Math.floor(Math.random()*256).toString(16).padStart(2,'0').repeat(3);
   const rainbow = () => '#' + Math.floor(Math.random()*Math.pow(256,3)).toString(16).padStart(6,'0');
   const standard = () => document.querySelector(`#${tools.lastMouseBtn()}-mouse-color input`).value;
 
-  // Predefined color picker event listeners
+  // Event listeners
   document.querySelector('.preset-colors').addEventListener('click', setColorMode);
+  document.querySelector('#left-mouse-color input').addEventListener('change', setMouseColors);
+  document.querySelector('#right-mouse-color input').addEventListener('change', setMouseColors);
+  document.querySelector('#canvas-color').addEventListener('change', () => {
+    colors.canvas = document.querySelector('#canvas-color').value;
+    cssVars.style.setProperty('--cell-color', colors.canvas);
+  });
+  document.querySelector('#grid-color').addEventListener('change', () => {
+    colors.grid = document.querySelector('#grid-color').value;
+    settings.updateGridLines();
+  });
+  document.querySelector('#hover-color').addEventListener('change', e => {
+    colors.hover = document.querySelector('#hover-color').value
+    cssVars.style.setProperty('--cell-hover-color', e.target.value)
+  });
+
   function setColorMode(e) {
     let identifier;
     if (typeof e == 'object') identifier = e.target.id;
@@ -43,7 +50,7 @@ const color = (() => {
     
     switch (identifier) {
       case 'default-color':
-        color.mode = 'standard';
+        colors.mode = 'standard';
         const isAlreadyDefault = document.querySelector('#default-color').style.background == '' ? true : false;
 
         leftPicker.children[0].innerText = isAlreadyDefault ? '#FFFFFF' : document.querySelector('#left-mouse-color input').value.toUpperCase();
@@ -60,7 +67,7 @@ const color = (() => {
         rightPicker.children[2].style.margin = 0;
         break;
       case 'greyscale-color':
-        color.mode = 'greyscale';
+        colors.mode = 'greyscale';
         leftPicker.children[0].innerText = 'GREYSCALE';
         leftPicker.children[0].style.fontSize = '0.66cqw';
         leftPicker.children[0].style.margin = '5px';
@@ -75,7 +82,7 @@ const color = (() => {
         rightPicker.children[2].style.margin = '5px';
         break;
       case 'rainbow-color':
-        color.mode = 'rainbow';
+        colors.mode = 'rainbow';
         leftPicker.children[0].innerText = 'RAINBOW';
         leftPicker.children[0].style.fontSize = '0.9484cqw';
         leftPicker.children[0].style.margin = 0;
@@ -92,10 +99,6 @@ const color = (() => {
     }
   }
 
-  // Mouse color picker event listeners
-  document.querySelector('#left-mouse-color input').addEventListener('change', setMouseColors);
-  document.querySelector('#right-mouse-color input').addEventListener('change', setMouseColors);
-
   // Updates the default color picker colors on changes to the mouse colors
   function setMouseColors() {
     const leftColor = document.querySelector('#left-mouse-color input').value;
@@ -108,44 +111,40 @@ const color = (() => {
   }
 
   function resetToDefault() {
-    color.canvas = '';
-    color.grid = '#696969';
-    color.hover = '#696969';
-    color.mode = 'standard';
+    colors.canvas = '';
+    colors.grid = '#696969';
+    colors.hover = '#696969';
+    colors.mode = 'standard';
 
     // CSS settings
     cssVars.style.setProperty('--cell-color', 'black');
-    cssVars.style.setProperty('--grid-color', color.grid);
-    cssVars.style.setProperty('--cell-hover-color', color.hover);
+    cssVars.style.setProperty('--grid-color', colors.grid);
+    cssVars.style.setProperty('--cell-hover-color', colors.hover);
     
     // Mouse picker colors
     document.querySelector('#left-mouse-color input').value = '#FFFFFF';
     document.querySelector('#right-mouse-color input').value = '#696969';
     setMouseColors();
   }
+  
+  function rgbToHex(string) {
+    console.log(string)
+    const [r, g, b] = string.match(/\d+/g).map(Number);
+    return "#" + r.toString(16).padStart(2,'0') + g.toString(16).padStart(2,'0') + b.toString(16).padStart(2,'0');
+  }
 
-  // App settings color event listener
-  document.querySelector('#canvas-color').addEventListener('change', () => {
-    color.canvas = document.querySelector('#canvas-color').value;
-    cssVars.style.setProperty('--cell-color', color.canvas);
-  });
-  document.querySelector('#grid-color').addEventListener('change', () => {
-    color.grid = document.querySelector('#grid-color').value;
-    settings.updateGridLines();
-  });
-  document.querySelector('#hover-color').addEventListener('change', e => {
-    color.hover = document.querySelector('#hover-color').value
-    cssVars.style.setProperty('--cell-hover-color', e.target.value)
-  });
+  // Initial settings for page load
+  setColorMode('default-color');
 
   // Retrieval functions
   return {
-    active: (override) => color.active(override),
-    canvas: () => color.canvas,
-    grid: () => color.grid,
-    hover: () => color.hover,
-    //mode: () => color.mode,
-    reset: resetToDefault
+    active: (override) => colors.active(override),
+    canvas: () => colors.canvas,
+    grid: () => colors.grid,
+    hover: () => colors.hover,
+    //mode: () => colors.mode,
+    reset: resetToDefault,
+    rgbToHex: (string) => rgbToHex(string)
   };
 })();
 
@@ -163,28 +162,15 @@ const grid = (function() {
     totalSqrs: null // The actual number of cells able to fit inside the circle
   };
 
+  // Document elements
+  const bgImg = document.querySelector('.background');
+  const header = document.querySelector('header');
+  const controls = document.querySelectorAll('.controls');
+  const cellsCon = document.querySelector('.cells-container');
+  const footer = document.querySelector('footer');
+
   // Event listener for window size changes
   window.addEventListener('resize', resizeDocument);
-
-  function resizeDocument() {
-    // Determine the maximum background image size based on the smallest value of the window's width or height
-    let maxHeight = window.innerHeight - header.clientHeight - footer.clientHeight - 100;
-    let maxWidth = window.innerWidth - 2 * controls[0].clientWidth - 200; // Control panel widths and minimum spacing between
-    const [dimension, size] = maxHeight < maxWidth ? ['height', maxHeight / grid.ratio] : ['width', maxWidth / grid.ratio];
-
-    // Set the size of the background image to fit the space available
-    if (dimension == 'height') {
-      cssVars.style.setProperty('--content-area-height', `${size}px`);
-      cssVars.style.setProperty('--content-area-width', undefined);
-    }
-    else {
-      cssVars.style.setProperty('--content-area-height', undefined);
-      cssVars.style.setProperty('--content-area-width', `${size}px`);
-    }
-
-    calcCellLength(settings.canvasSize());
-    setCellSize();
-  }
 
   function calcCellLength(maxSqrs) {
     if (maxSqrs === undefined) throw 'Parameter maxSqrs was not provided.';
@@ -267,13 +253,11 @@ const grid = (function() {
     }
   }
 
-  function setCellSize() {
-    cssVars.style.setProperty('--cell-size', `${grid.cellLength}px`);
-  }
-
   // Show a rolling wave move across the canvas and clear to the background color
   async function clearCanvas(fill) {
+    tools.toggleAllow(false);
     settings.toggleHover(false);
+    history.clear();
 
     let trailLines = [[], [], []];
 
@@ -283,6 +267,7 @@ const grid = (function() {
       trailLines = await displayWipeLines(point, trailLines, fill);
 
     settings.toggleHover(settings.hover());
+    tools.toggleAllow(true);
   }
 
   // Display a line that wipes the sketcher clean
@@ -317,7 +302,7 @@ const grid = (function() {
         cell.classList.remove('disable-hover');
       }
       else {
-        cell.style.background = color.active(fill);
+        cell.style.background = colors.active(fill);
         cell.classList.add('disable-hover');
       }
     }
@@ -330,6 +315,26 @@ const grid = (function() {
     await settings.sleep(-0.005117707 * grid.totalSqrs + 30.491299898);
 
     return trailLines;
+  }
+
+  // Set the maximum background image size based on the smallest value of the window's width or height
+  function resizeDocument() {
+    // Determine the maximum size of the blackhole
+    const maxWidth = window.innerWidth - 2 * controls[0].clientWidth - 2 * controls[0].offsetLeft - 100; // Spacing between control panels spacing between
+    const maxHeight = window.innerHeight - header.clientHeight - footer.clientHeight - 100;
+    const smallest = maxWidth <= maxHeight ? maxWidth : maxHeight;
+
+    // Set the background image width and height to the ratio of the blackhole size
+    cssVars.style.setProperty('--content-area-height', `${smallest / grid.ratio}px`);
+    cssVars.style.setProperty('--content-area-width', `${smallest / grid.ratio}px`);
+
+    // Resize the canvas
+    calcCellLength(settings.canvasSize());
+    setCellSize();
+  }
+
+  function setCellSize() {
+    cssVars.style.setProperty('--cell-size', `${grid.cellLength}px`);
   }
 
   // Retrieval functions
@@ -354,7 +359,7 @@ const grid = (function() {
 //************************************************** */
 const history = (function() {
   const history = {
-    prevStep: [{}],
+    actions: [{}],
     step: 0
   };
 
@@ -362,18 +367,25 @@ const history = (function() {
   document.querySelector('#undo-button').addEventListener('click', undoAction);
   document.querySelector('#redo-button').addEventListener('click', redoAction);
 
+  function clearHistory() {
+    history.actions = [{}];
+    history.step = 0;
+
+    styleUndoRedoButtons();
+  }
+
   function recordHistory(coord, color, hover, lineEntry) {
+    // Record all actions done with the current tool action
     if (tools.active()) {
       // Delete redo history if it exists
       if (history.step !== 0) {
-        history.prevStep.splice(0, history.step + 1);
-        history.prevStep.unshift({});
+        history.actions.splice(0, history.step + 1);
+        history.actions.unshift({});
         history.step = 0;
       }
   
-      if (Object.hasOwn(history.prevStep[0], coord)) return;
       if (lineEntry) { // Add the drawn line to the history record
-        history.prevStep[0][coord] = {
+        history.actions[0][coord] = {
           newColor: tools.lineData().cells[coord].newColor,
           oldColor: tools.lineData().cells[coord].oldColor,
           newHover: tools.lineData().cells[coord].newHover,
@@ -381,7 +393,10 @@ const history = (function() {
         };
       }
       else { // Add drawing, erasing and moving to the history record
-        history.prevStep[0][coord] = {
+        // Do not add to history if the current cell has already been modified in the current action step
+        if (Object.hasOwn(history.actions[0], coord)) return;
+
+        history.actions[0][coord] = {
           newColor: color,
           oldColor: document.querySelector(`.cell[data-coordinate="${coord}"]`).style.background,
           newHover: hover,
@@ -389,26 +404,40 @@ const history = (function() {
         };
       }
     }
-    else history.prevStep.unshift({});
-  }
-  
-  function undoAction() {
-    if (history.step != history.prevStep.length - 1) {
-      history.step++;
-  
-      for (const [key, value] of Object.entries(history.prevStep[history.step])) {
-        document.querySelector(`.cell[data-coordinate="${key}"]`).style.background = value.oldColor;
-        if (value.oldHover == 'enable') document.querySelector(`.cell[data-coordinate="${key}"]`).classList.remove('disable-hover');
-        else document.querySelector(`.cell[data-coordinate="${key}"]`).classList.add('disable-hover');
+    else confirmChanges();
+
+    // Prepare a new history entry once the current tool action has finished
+    function confirmChanges() {
+      // Check that a change has occured with the last action performed
+      let noChange = true;
+      for (const newAction of Object.values(history.actions[0])) {
+        // Check for actions performed on blank space
+        if (newAction.newColor === '' && newAction.oldColor === '') continue;
+        // Check for changes to cell color
+        if (newAction.newColor !== '' && newAction.oldColor === '') {
+          noChange = false;
+          break;
+        }
+        // Check if a color has been applied to a cell with that color already applied
+        else if (newAction.oldColor[0] !== '#') {
+          if (newAction.newColor.toUpperCase() !== colors.rgbToHex(newAction.oldColor).toUpperCase()) {
+            noChange = false;
+            break;
+          }
+        }
       }
+
+      // If no changes have occurred, do not record the history
+      if (noChange === true) history.actions[0] = [];
+      else history.actions.unshift({}); // Store the history if changes did occur
     }
-  
-    if (history.prevStep.length === 0) history.prevStep.push([]);
+
+    styleUndoRedoButtons();
   }
-  
+
   function redoAction() {
     if (history.step > 0) {
-      for (const [key, value] of Object.entries(history.prevStep[history.step])) {
+      for (const [key, value] of Object.entries(history.actions[history.step])) {
         if (value.newHover == 'enable') document.querySelector(`.cell[data-coordinate="${key}"]`).classList.remove('disable-hover');
         else document.querySelector(`.cell[data-coordinate="${key}"]`).classList.add('disable-hover');
         document.querySelector(`.cell[data-coordinate="${key}"]`).style.background = value.newColor;
@@ -416,13 +445,57 @@ const history = (function() {
   
       history.step--;
     }
+
+    styleUndoRedoButtons();
   }
+
+  function styleUndoRedoButtons() {
+    if (history.actions.length == 1) { // Styling for when there is no history
+      document.querySelector('#undo-button img').style.filter = 'brightness(70%)';
+      document.querySelector('#undo-button div').classList.remove('icon-hover')
+      document.querySelector('#redo-button img').style.filter = 'brightness(70%)';
+      document.querySelector('#redo-button div').classList.remove('icon-hover')
+    }
+    else if (history.step == 0) { // Styling for when there is no redo history
+      document.querySelector('#undo-button img').style.filter = 'none';
+      document.querySelector('#undo-button div').classList.add('icon-hover')
+      document.querySelector('#redo-button img').style.filter = 'brightness(70%)';
+      document.querySelector('#redo-button div').classList.remove('icon-hover')
+    }
+    else if (history.step === history.actions.length - 1) { // Styling for when there is no undo history
+      document.querySelector('#undo-button img').style.filter = 'brightness(70%)';
+      document.querySelector('#undo-button div').classList.remove('icon-hover')
+      document.querySelector('#redo-button img').style.filter = 'none';
+      document.querySelector('#redo-button div').classList.add('icon-hover')
+    }
+    else { // Styling for all other cases
+      document.querySelector('#undo-button img').style.filter = 'none';
+      document.querySelector('#redo-button img').style.filter = 'none';
+    }
+  }
+
+  function undoAction() {
+    if (history.step !== history.actions.length - 1) {
+      history.step++;
+  
+      for (const [key, value] of Object.entries(history.actions[history.step])) {
+        document.querySelector(`.cell[data-coordinate="${key}"]`).style.background = value.oldColor;
+        if (value.oldHover == 'enable') document.querySelector(`.cell[data-coordinate="${key}"]`).classList.remove('disable-hover');
+        else document.querySelector(`.cell[data-coordinate="${key}"]`).classList.add('disable-hover');
+      }
+    }
+
+    styleUndoRedoButtons();
+  }
+
+  styleUndoRedoButtons();
 
   // Global functions
   return {
+    clear: clearHistory,
     recordHistory: (coord, color, hover, lineEntry = false) => recordHistory(coord, color, hover, lineEntry),
-    redoAction: () => redoAction(),
-    undoAction: () => undoAction()
+    redoAction: redoAction,
+    undoAction: undoAction
   }
 })();
 
@@ -437,31 +510,43 @@ const settings = (() => {
     hover: true
   };
 
-  // Canvas size slider
+  // Document elements
+  const hoverCheckbox = document.querySelector('#hover-checkbox');  
+  const gridCheckbox = document.querySelector('#grid-checkbox');
+  const gridLine = document.querySelector('#grid-line');
   const slider = document.querySelector('#grid-slider');
+
+  // Setting buttons event listeners
+  document.querySelector('#clear-button').addEventListener('click', () => grid.clearCanvas());
+  document.querySelector('#random-color-button').addEventListener('click', () => grid.clearCanvas('rainbow'));
+  document.querySelector('#random-greyscale-button').addEventListener('click', () => grid.clearCanvas('greyscale'));
+  document.querySelector('#reset-button').addEventListener('click', async () => await resetToDefault());
+  document.querySelector('#download-button').addEventListener('click', downloadImage);
+
+  // Canvas size slider
   slider.oninput = async () => {
-    await grid.calcCellLength(document.querySelector('#grid-slider').value);
+    await grid.calcCellLength(slider.value);
     await grid.calcTotalCells();
     // Update the total cells displayed in the settings
     document.querySelector('.info-total-cells').innerText = grid.totalSqrs() + ' cells';
   };
-  document.querySelector('#grid-slider').addEventListener('click', () => grid.createNewCanvas());
+  slider.addEventListener('click', () => grid.createNewCanvas());
 
   // Grid line activation
-  document.querySelector('#grid-checkbox').addEventListener('change', updateGridLines);
-  document.querySelector('#grid-line').addEventListener('change', updateGridLines);
+  gridCheckbox.addEventListener('change', updateGridLines);
+  gridLine.addEventListener('change', updateGridLines);
   function updateGridLines() {
-    settings.grid = document.querySelector('#grid-checkbox').checked;
-    settings.gridLine = document.querySelector('#grid-line').value;
+    settings.grid = gridCheckbox.checked;
+    settings.gridLine = gridLine.value;
     if (settings.grid) { // Show or hide the grid
-      cssVars.style.setProperty('--grid-color', color.grid() + '50'); // Add opacity
+      cssVars.style.setProperty('--grid-color', colors.grid() + '50'); // Add opacity
       cssVars.style.setProperty('--grid-line-type', settings.gridLine);
     }
     else cssVars.style.setProperty('--grid-line-type', 'none');
   }
   
   // Mouse hover activation
-  document.querySelector('#hover-checkbox').addEventListener('change', () => {
+  hoverCheckbox.addEventListener('change', () => {
     settings.hover = document.querySelector('#hover-checkbox').checked;
     toggleHover(settings.hover);
   });
@@ -476,11 +561,25 @@ const settings = (() => {
     }
   }
 
-  // Setting buttons event listeners
-  document.querySelector('#clear-button').addEventListener('click', () => grid.clearCanvas());
-  document.querySelector('#random-color-button').addEventListener('click', () => grid.clearCanvas('rainbow'));
-  document.querySelector('#random-greyscale-button').addEventListener('click', () => grid.clearCanvas('greyscale'));
-  document.querySelector('#reset-button').addEventListener('click', async () => await resetToDefault());
+  async function downloadImage() {
+    let canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw 'Browser does not support canvas!';
+  
+    let image = new Image();
+    image.onerror = e => console.log(e)
+    image.src = './imgs/background.jpg?' + (new Date()).getTime();
+    image.onload = function() {
+      canvas.width = this.width;
+      canvas.height = this.height;
+      ctx.drawImage(this, 0, 0);
+  
+      let link = document.createElement('a');
+      link.download = 'Blackhole Sketcher.jpeg';
+      link.href = canvas.toDataURL('image/jpeg');
+      link.click();
+    };
+  }
 
   async function resetToDefault() {
     settings.canvasSize = 1070;
@@ -488,20 +587,21 @@ const settings = (() => {
     settings.gridLine = 'solid';
     settings.hover = true;
 
-    await color.reset();
+    await colors.reset();
     tools.reset();
+    history.clear();
 
     // Default colors
-    document.querySelector('#canvas-color').value = color.canvas();
-    document.querySelector('#grid-color').value = color.grid();
-    document.querySelector('#hover-color').value = color.hover();
+    document.querySelector('#canvas-color').value = colors.canvas();
+    document.querySelector('#grid-color').value = colors.grid();
+    document.querySelector('#hover-color').value = colors.hover();
 
     // App settings
-    document.querySelector('#grid-checkbox').checked = settings.grid;
-    document.querySelector('#grid-line').value = settings.gridLine;
-    document.querySelector('#hover-checkbox').checked = settings.hover;
+    gridCheckbox.checked = settings.grid;
+    gridLine.value = settings.gridLine;
+    hoverCheckbox.checked = settings.hover;
     updateGridLines();
-    toggleHover(grid.isCanvasReady ? settings.hover : false);
+    toggleHover(grid.isCanvasReady() ? settings.hover : false);
 
     // Reset canvas only if one already exists and is a different size from the default
     if (grid.isCanvasReady()) {
@@ -540,18 +640,31 @@ const settings = (() => {
 const tools = (() => {
    const tools = {
     active: false,
+    allowed: false,
     lastMouseBtn: 'left',
     lineData: null,
     moveData: null,
     selected: 'draw',
   };
 
-  // Initial tools set up
-  document.querySelector('#draw-select').nextElementSibling.classList.remove('icon-hover');
-  document.querySelector('#draw-select').nextElementSibling.classList.add('selected');
-
   // Tool button event listeners
   document.querySelector('.tool-selection').addEventListener('click', activateTool, true);
+
+  // Turn off auto fill when mouse button is lifted
+  window.addEventListener('mouseup', () => {
+    if (tools.active) {
+      if (tools.selected != 'line' && tools.selected != 'move') {
+        tools.active = false
+        history.recordHistory();
+      }
+    }
+  }); 
+
+  // Cell interaction event listeners
+  document.querySelector('.cells-container').addEventListener('mousedown', initiateToolAction);
+  document.querySelector('.cells-container').addEventListener('mouseover', continueToolAction);
+  document.querySelector('.cells-container').addEventListener('contextmenu', e => e.preventDefault()); // Stop right click menu on grid
+
 
   function activateTool(e) {
     document.querySelector(`#${tools.selected}-select`).nextElementSibling.classList.remove('selected');
@@ -580,123 +693,8 @@ const tools = (() => {
     document.querySelector(`#${tools.selected}-select`).nextElementSibling.classList.add('selected');
   }
 
-  // Turn off auto fill when mouse button is lifted
-  window.addEventListener('mouseup', () => {
-    if (tools.active) {
-      if (tools.selected != 'line' && tools.selected != 'move') {
-        tools.active = false
-        history.recordHistory();
-      }
-    }
-  }); 
-
-  // Cell interaction event listeners
-  document.querySelector('.cells-container').addEventListener('mousedown', initiateToolAction);
-  document.querySelector('.cells-container').addEventListener('mouseover', continueToolAction);
-  document.querySelector('.cells-container').addEventListener('contextmenu', e => e.preventDefault()); // Stop right click menu on grid
-
-  function initiateToolAction(e) {
-    e.preventDefault();
-  
-    // Return if the mouse moves beyond the grid to prevent a null error
-    let cell;  
-    try {
-      cell = document.querySelector(`.cell[data-coordinate="${e.target.attributes[1].value}"]`);
-    }
-    catch { return; }
-  
-    tools.lastMouseBtn = e.button === 0 ? 'left'
-      : e.button === 2 ? 'right'
-      : null;
-  
-    switch (tools.selected) {
-      case 'draw':
-        tools.active = true;
-        history.recordHistory(e.target.attributes[1].value, color.active(), 'disable');
-        fillCell(cell, color.active(), 'disable');
-        break;
-      case 'erase':
-        tools.active = true;
-        if (!e.target.style.background || e.target.style.background == document.querySelector('#canvas-color').value) return;
-        history.recordHistory(e.target.attributes[1].value, color.canvas(), 'enable');
-        fillCell(cell, color.canvas(), 'enable');
-        break;
-      case 'line':
-        if (!tools.lastMouseBtn) return;
-          
-        // Initiate the line if not already active
-        if (!tools.active) {
-          tools.active = true;
-  
-          const mouseCoord = e.target.dataset.coordinate;
-          tools.lineData = {
-            origin: mouseCoord, // Initial coordinate of mouse click
-            cells: {[mouseCoord]: setCellRecord(mouseCoord)},
-          };
-  
-          fillCell(cell, color.active(), 'disable');
-        }
-        else {
-          for (const coord of Object.keys(tools.lineData.cells))
-            history.recordHistory(coord, '', '', true);
-          tools.active = false;
-          history.recordHistory(); // End the current history log
-        }
-        break;
-      case 'move':
-        // Activate the tool if not already
-        if (!tools.active) {
-          tools.active = true;  
-          
-          const cellCoord = e.target.attributes[1].value;
-          const origin = document.querySelector(`.cell[data-coordinate="${cellCoord}"`);
-          const isCanvasColor = origin.style.background == '';
-  
-          tools.moveData = {
-            origin: {
-              coord: cellCoord,
-              ...setCellRecord(cellCoord, isCanvasColor)
-            },
-            target: {
-              coord: cellCoord,
-              ...setCellRecord(cellCoord, isCanvasColor)
-            } 
-          };
-  
-          // Add opacity and a border to the cell being moved
-          if (e.target.style.background !== '') {
-            const rgb = e.target.style.background.match(/\d+/g).map(Number);
-            fillCell(origin, `rgba(${rgb.join(',')}, 0.65)`, 'disable', `solid 2px ${document.querySelector('#grid-color').value}`);
-          }
-          else fillCell(origin, color.canvas(), 'disable', `solid 2px ${document.querySelector('#grid-color').value}`);
-        }
-        // Finalise moving the cell to the new location
-        else {
-          // Return the cells to their original state so that the history can be recorder correctly
-          const origin = document.querySelector(`.cell[data-coordinate="${tools.moveData.origin.coord}"]`);
-          fillCell(origin, tools.moveData.origin.oldColor, tools.moveData.origin.oldHover);
-          const newCell = document.querySelector(`.cell[data-coordinate="${tools.moveData.target.coord}"]`);
-          fillCell(newCell, tools.moveData.target.oldColor, tools.moveData.target.oldHover);
-  
-          // Don't record history if the origin is not moved to another cell
-          if (tools.moveData.origin.coord != tools.moveData.target.coord) {
-            history.recordHistory(tools.moveData.origin.coord, color.canvas(), 'enable');
-            history.recordHistory(tools.moveData.target.coord, tools.moveData.origin.oldColor, tools.moveData.origin.oldHover);
-          }
-  
-          // Set the new cell states
-          fillCell(origin, color.canvas(), 'enable');
-          fillCell(newCell, tools.moveData.origin.oldColor, tools.moveData.origin.oldHover);
-  
-          tools.active = false;
-          if (tools.moveData.origin.coord != tools.moveData.target.coord) history.recordHistory();
-        }
-        break;
-    }
-  }
-  
   function continueToolAction(e) {
-    if (!tools.active) return;
+    if (tools.active === false || tools.allowed === false) return;
   
     // Return if the mouse moves outside of the cells range
     let cell;  
@@ -707,18 +705,18 @@ const tools = (() => {
   
     switch (tools.selected) {
       case 'draw':
-        history.recordHistory(e.target.attributes[1].value, color.active(), 'disable');
-        fillCell(cell, color.active(), 'disable');
+        history.recordHistory(e.target.attributes[1].value, colors.active(), 'disable');
+        fillCell(cell, colors.active(), 'disable');
         break;
       case 'erase':
-        history.recordHistory(e.target.attributes[1].value, color.canvas(), 'enable');
-        fillCell(cell, color.canvas(), 'enable');
+        history.recordHistory(e.target.attributes[1].value, colors.canvas(), 'enable');
+        fillCell(cell, colors.canvas(), 'enable');
         break;
       case 'line':
         // Remove the previous line drawn
         for (const [key, point] of Object.entries(tools.lineData.cells)) {
           if (tools.lineData.origin == key) { // Skip the origin coordinate
-            fillCell(document.querySelector(`.cell[data-coordinate="${tools.lineData.origin}"]`), color.active(), 'disable');
+            fillCell(document.querySelector(`.cell[data-coordinate="${tools.lineData.origin}"]`), colors.active(), 'disable');
             continue;
           }
   
@@ -757,7 +755,7 @@ const tools = (() => {
           let newX = origin[0] + Math.ceil(i * dx);
           let newY = origin[1] + Math.ceil(i * dy);
           tools.lineData.cells[`${newX}-${newY}`] = setCellRecord(`${newX}-${newY}`); // Add the new point
-          fillCell(document.querySelector(`.cell[data-coordinate="${newX}-${newY}"]`), color.active(), 'disable');
+          fillCell(document.querySelector(`.cell[data-coordinate="${newX}-${newY}"]`), colors.active(), 'disable');
   
           // The number of x and y steps between the previous point and the new point
           let gapY = Math.abs(newY - prevPoint[1]);
@@ -768,14 +766,14 @@ const tools = (() => {
             for (let j = 1; j < gapX; j++) {
               let newX = prevPoint[0] + j * Math.sign(dx);
               tools.lineData.cells[`${newX}-${newY}`] = setCellRecord(`${newX}-${newY}`); // Add the new point
-              fillCell(document.querySelector(`.cell[data-coordinate="${newX}-${newY}"]`), color.active(), 'disable');
+              fillCell(document.querySelector(`.cell[data-coordinate="${newX}-${newY}"]`), colors.active(), 'disable');
             }
           }
           else if (gapY > 1) {
             for (let j = 1; j < gapY; j++) {
               let newY = prevPoint[1] + j * Math.sign(dy);
               tools.lineData.cells[`${newX}-${newY}`] = setCellRecord(`${newX}-${newY}`); // Add the new point
-              fillCell(document.querySelector(`.cell[data-coordinate="${newX}-${newY}"]`), color.active(), 'disable');
+              fillCell(document.querySelector(`.cell[data-coordinate="${newX}-${newY}"]`), colors.active(), 'disable');
             }
           }
   
@@ -793,7 +791,7 @@ const tools = (() => {
             const rgb = oldCell.style.background.match(/\d+/g).map(Number);
             fillCell(oldCell, `rgba(${rgb.join(',')}, 0.65)`, 'disable', `solid 2px ${document.querySelector('#grid-color').value}`);
           }
-          else fillCell(oldCell, color.canvas(), 'disable', `solid 2px ${document.querySelector('#grid-color').value}`);
+          else fillCell(oldCell, colors.canvas(), 'disable', `solid 2px ${document.querySelector('#grid-color').value}`);
         }
   
         // Save the new cells current state
@@ -816,71 +814,139 @@ const tools = (() => {
     cell.style.background = color;
     border ? cell.style.border = border : cell.style.border = '';
   }
+
+  function initiateToolAction(e) {
+    e.preventDefault();
+
+    // Return if not allowed to interact
+    if (tools.allowed === false) return;
+  
+    // Return if the mouse moves beyond the grid to prevent a null error
+    let cell;  
+    try {
+      cell = document.querySelector(`.cell[data-coordinate="${e.target.attributes[1].value}"]`);
+    }
+    catch { return; }
+  
+    tools.lastMouseBtn = e.button === 0 ? 'left'
+      : e.button === 2 ? 'right'
+      : null;
+  
+    switch (tools.selected) {
+      case 'draw':
+        tools.active = true;
+        history.recordHistory(e.target.attributes[1].value, colors.active(), 'disable');
+        fillCell(cell, colors.active(), 'disable');
+        break;
+      case 'erase':
+        tools.active = true;
+        if (!e.target.style.background || e.target.style.background == document.querySelector('#canvas-color').value) return;
+        history.recordHistory(e.target.attributes[1].value, colors.canvas(), 'enable');
+        fillCell(cell, colors.canvas(), 'enable');
+        break;
+      case 'line':
+        if (!tools.lastMouseBtn) return;
+          
+        // Initiate the line if not already active
+        if (!tools.active) {
+          tools.active = true;
+  
+          const mouseCoord = e.target.dataset.coordinate;
+          tools.lineData = {
+            origin: mouseCoord, // Initial coordinate of mouse click
+            cells: {[mouseCoord]: setCellRecord(mouseCoord)},
+          };
+  
+          fillCell(cell, colors.active(), 'disable');
+        }
+        else {
+          for (const coord of Object.keys(tools.lineData.cells))
+            history.recordHistory(coord, '', '', true);
+          tools.active = false;
+          history.recordHistory(); // End the current history log
+        }
+        break;
+      case 'move':
+        // Activate the tool if not already
+        if (!tools.active) {
+          tools.active = true;  
+          
+          const cellCoord = e.target.attributes[1].value;
+          const origin = document.querySelector(`.cell[data-coordinate="${cellCoord}"`);
+          const isCanvasColor = origin.style.background == '';
+  
+          tools.moveData = {
+            origin: {
+              coord: cellCoord,
+              ...setCellRecord(cellCoord, isCanvasColor)
+            },
+            target: {
+              coord: cellCoord,
+              ...setCellRecord(cellCoord, isCanvasColor)
+            } 
+          };
+  
+          // Add opacity and a border to the cell being moved
+          if (e.target.style.background !== '') {
+            const rgb = e.target.style.background.match(/\d+/g).map(Number);
+            fillCell(origin, `rgba(${rgb.join(',')}, 0.65)`, 'disable', `solid 2px ${document.querySelector('#grid-color').value}`);
+          }
+          else fillCell(origin, colors.canvas(), 'disable', `solid 2px ${document.querySelector('#grid-color').value}`);
+        }
+        // Finalise moving the cell to the new location
+        else {
+          // Return the cells to their original state so that the history can be recorder correctly
+          const origin = document.querySelector(`.cell[data-coordinate="${tools.moveData.origin.coord}"]`);
+          fillCell(origin, tools.moveData.origin.oldColor, tools.moveData.origin.oldHover);
+          const newCell = document.querySelector(`.cell[data-coordinate="${tools.moveData.target.coord}"]`);
+          fillCell(newCell, tools.moveData.target.oldColor, tools.moveData.target.oldHover);
+  
+          // Don't record history if the origin is not moved to another cell
+          if (tools.moveData.origin.coord != tools.moveData.target.coord) {
+            history.recordHistory(tools.moveData.origin.coord, colors.canvas(), 'enable');
+            history.recordHistory(tools.moveData.target.coord, tools.moveData.origin.oldColor, tools.moveData.origin.oldHover);
+          }
+  
+          // Set the new cell states
+          fillCell(origin, colors.canvas(), 'enable');
+          fillCell(newCell, tools.moveData.origin.oldColor, tools.moveData.origin.oldHover);
+  
+          tools.active = false;
+          if (tools.moveData.origin.coord != tools.moveData.target.coord) history.recordHistory();
+        }
+        break;
+    }
+  }
   
   function setCellRecord(coord, isCanvasColor = false) {
     return {
-      newColor: isCanvasColor ? color.canvas() : color.active(),
+      newColor: isCanvasColor ? colors.canvas() : colors.active(),
       oldColor: document.querySelector(`.cell[data-coordinate="${coord}"]`).style.background,
       newHover: isCanvasColor ? 'enable' : 'disable',
       oldHover: document.querySelector(`.cell[data-coordinate="${coord}"]`).classList.contains('disable-hover') ? 'disable' : 'enable'
     };
   }
 
+  function toggleAllowState(identifier) {
+    tools.allowed = identifier;
+  }
+
+  // Initialise app
+  activateTool('draw-select');
+
   // Retrieval functions
   return {
     active: () => tools.active,
+    allowed: () => tools.allowed,
     lastMouseBtn: () => tools.lastMouseBtn,
     lineData: () => tools.lineData,
     //moveData: () => tools.moveData,
     //selected: () => tools.selected,
-    reset: () => activateTool('draw-select')
+    reset: () => activateTool('draw-select'),
+    toggleAllow: (identifier) => toggleAllowState(identifier)
   };
 })();
-
 
 // Create the canvas on page load
 grid.resizeDocument();
 grid.createNewCanvas();
-
-
-
-
-
-
-/*
-
-
-// Button event listeners
-document.querySelector('#download-button').addEventListener('click', downloadImage);
-document.querySelector('#reset-button').addEventListener('click', initialiseApp);
-
-
-
-
-
-
-
-
-
-
-async function downloadImage() {
-  let canvas = document.createElement('canvas');
-  if (!canvas.getContext) throw 'Browser does not support canvas!';
-
-  let image = new Image();
-  image.onerror = e => console.log(e)
-  image.src = './imgs/background.jpg?' + (new Date()).getTime();
-  image.onload = function() {
-    canvas.width = this.width;
-    canvas.height = this.height;
-    ctx.drawImage(this, 0, 0);
-
-    let link = document.createElement('a');
-    link.download = 'Blackhole Sketcher.jpeg';
-    link.href = canvas.toDataURL('image/jpeg');
-    link.click();
-  };
-}
-
-*/
-
