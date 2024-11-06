@@ -592,7 +592,7 @@ const settings = (() => {
           cell.style.background === ''
             ? ctx.fillStyle = document.querySelector('#canvas-color').value // If the cell is blank, set to the canvas colour
             : ctx.fillStyle = cell.style.background; // Set to the cell colour
-          ctx.fillRect(xStart + x * cellLength, yStart, cellLength, cellLength);
+          ctx.fillRect(xStart + x * cellLength, yStart, cellLength * 1.05, cellLength * 1.05);
         }
       }
 
