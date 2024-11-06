@@ -128,7 +128,6 @@ const colors = (() => {
   }
   
   function rgbToHex(string) {
-    console.log(string)
     const [r, g, b] = string.match(/\d+/g).map(Number);
     return "#" + r.toString(16).padStart(2,'0') + g.toString(16).padStart(2,'0') + b.toString(16).padStart(2,'0');
   }
@@ -349,7 +348,7 @@ const grid = (function() {
     radius: () => grid.radius, 
     ratio: () => grid.ratio, // Ratio of the blackhole cells to the total image dimension cells
     resizeDocument: resizeDocument,
-    //rows: () => grid.rows, // Array of rows indicating where cells can be placed inside the grid
+    rows: () => grid.rows, // Array of rows indicating where cells can be placed inside the grid
     totalSqrs: () => grid.totalSqrs
   }
 })();
@@ -561,26 +560,42 @@ const settings = (() => {
     }
   }
 
+  // Create a canvas with the blackhole image and the user's creation in the center and download it
   async function downloadImage() {
-    let canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) throw 'Browser does not support canvas!';
 
-    const drawing = document.querySelector('.cells-container').cloneNode();
-    console.log(dawing.width, dawing.height)
+    const cells = document.querySelector('.cells-container');
+    const bgSize = document.querySelector('.background').naturalWidth;
+    const radius = (bgSize * grid.ratio()) / 2.01; // Intentionally slightly smaller to ensure the image fits
+    const cellLength = Math.sqrt(Math.PI * Math.pow(radius, 2) / document.querySelector('#grid-slider').value); 
+    canvas.width = bgSize;
+    canvas.height = bgSize;
 
     let image = new Image();
     image.onerror = e => console.log(e)
     image.src = './imgs/background.jpg?' + (new Date()).getTime();
     image.onload = function() {
-      canvas.width = this.width;
-      canvas.height = this.height;
-      ctx.drawImage(this, 0, 0);
+      ctx.drawImage(this, 0, 0, bgSize, bgSize);
 
-      const coord = (canvas.width - drawing.width) / 2;
+      const maxCellsAcross = cells.childElementCount; // The number of cells across the diameter of the circle
+      const xyOffset = radius - (maxCellsAcross * cellLength) / 2; // Offset used to center correctly
+      const startCoord = bgSize / 2 - radius; // The start position of the square grid container
 
-      ctx.fillRect(coord, coord, drawing.width, drawing.height)
-  
+      // Iterate through each row and then each cell and add it to the canvas
+      for (const [y, row] of cells.childNodes.entries()) {
+        // Determine the start coordinates for adding each cell at the beginning of each row
+        const xStart = startCoord + xyOffset + (maxCellsAcross - row.childElementCount) * cellLength / 2;
+        const yStart = startCoord + xyOffset + y * cellLength;
+        for (const [x, cell] of row.childNodes.entries()) {
+          cell.style.background === ''
+            ? ctx.fillStyle = document.querySelector('#canvas-color').value // If the cell is blank, set to the canvas colour
+            : ctx.fillStyle = cell.style.background; // Set to the cell colour
+          ctx.fillRect(xStart + x * cellLength, yStart, cellLength, cellLength);
+        }
+      }
+
       let link = document.createElement('a');
       link.download = 'Blackhole Sketcher.jpeg';
       link.href = canvas.toDataURL('image/jpeg');
