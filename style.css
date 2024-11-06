@@ -1,8 +1,8 @@
 :root {
   --border-curve: 25px;
   --cell-size: 0px;
-  --cell-animate-in: cell-hover-in;
-  --cell-animate-out: cell-hover-out;
+  --cell-animate-in: undefined;
+  --cell-animate-out: undefined;
   --cell-color: black;
   --cell-hover-color: dimgrey;
   --content-area-width: 120vw; /*Initial value on site load only*/
@@ -10,7 +10,7 @@
   --font-color-main: white;
   --font-color-second: black;
   --greyscale-color: linear-gradient(to bottom right, white 20%, black, dimgrey, lightgrey, grey, black, lightgrey, darkgrey, dimgrey, lightgrey, black 80%);
-  --grid-color: white;
+  --grid-color: none;
   --grid-line-type: none;
   --icon-color: rgba(0, 0, 0, 0);
   --icon-hover-color: rgba(105, 150, 219);
