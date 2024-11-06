@@ -565,7 +565,10 @@ const settings = (() => {
     let canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     if (!ctx) throw 'Browser does not support canvas!';
-  
+
+    const drawing = document.querySelector('.cells-container').cloneNode();
+    console.log(dawing.width, dawing.height)
+
     let image = new Image();
     image.onerror = e => console.log(e)
     image.src = './imgs/background.jpg?' + (new Date()).getTime();
@@ -573,6 +576,10 @@ const settings = (() => {
       canvas.width = this.width;
       canvas.height = this.height;
       ctx.drawImage(this, 0, 0);
+
+      const coord = (canvas.width - drawing.width) / 2;
+
+      ctx.fillRect(coord, coord, drawing.width, drawing.height)
   
       let link = document.createElement('a');
       link.download = 'Blackhole Sketcher.jpeg';
