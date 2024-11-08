@@ -319,8 +319,17 @@ const grid = (function() {
   // Set the maximum background image size based on the smallest value of the window's width or height
   function resizeDocument() {
     // Determine the maximum size of the blackhole
-    const maxWidth = window.innerWidth - 2 * controls[0].clientWidth - 2 * controls[0].offsetLeft - 100; // Spacing between control panels spacing between
-    const maxHeight = window.innerHeight - header.clientHeight - footer.clientHeight - 100;
+    const [maxWidth, maxHeight] = (() => {
+      // Calculate a size for the blackhole based on whether this is a mobile or desktop browser
+      if (settings.mobile() === true) return [
+        window.innerWidth - 50,
+        window.innerHeight - header.clientHeight - footer.clientHeight - 50
+      ];
+      else return [
+        window.innerWidth - 2 * controls[0].clientWidth - 2 * controls[0].offsetLeft - 100, // Spacing between control panels spacing between
+        window.innerHeight - header.clientHeight - footer.clientHeight - 100
+      ];
+    })();
     const smallest = maxWidth <= maxHeight ? maxWidth : maxHeight;
 
     // Set the background image width and height to the ratio of the blackhole size
@@ -347,7 +356,7 @@ const grid = (function() {
     isCanvasReady: () => grid.isCanvasReady,
     radius: () => grid.radius, 
     ratio: () => grid.ratio, // Ratio of the blackhole cells to the total image dimension cells
-    resizeDocument: resizeDocument,
+    resizeDocument: (mobile = false) => resizeDocument(mobile),
     rows: () => grid.rows, // Array of rows indicating where cells can be placed inside the grid
     totalSqrs: () => grid.totalSqrs
   }
@@ -506,7 +515,8 @@ const settings = (() => {
     canvasSize: 1070,
     grid: false,
     gridLine: 'solid',
-    hover: true
+    hover: true,
+    mobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
   };
 
   // Document elements
@@ -650,6 +660,7 @@ const settings = (() => {
     //gridLine: () => settings.gridLine,
     canvasSize: () => settings.canvasSize,
     hover: () => settings.hover,
+    mobile: () => settings.mobile,
     sleep: ms => new Promise(r => setTimeout(r, ms)),
     updateGridLines: () => updateGridLines(),
     toggleHover: (identifier) => toggleHover(identifier)
@@ -969,6 +980,22 @@ const tools = (() => {
   };
 })();
 
-// Create the canvas on page load
-grid.resizeDocument();
-grid.createNewCanvas();
+// Check if running on a mobile browser
+if (settings.mobile() === true) {
+  // Hide the controls
+  const controls = document.querySelectorAll('.controls');
+  controls.forEach(control => control.style.display = 'none');
+  grid.resizeDocument(true);
+
+  // Display a message inside the blackhole
+  const warning = document.querySelector('.cells-container');
+  warning.innerText = 'Sorry!\nThis app is designed to run on a PC.';
+  warning.classList.add('mobile-warning');
+}
+else {
+  // Create the canvas on page load
+  grid.resizeDocument();
+  grid.createNewCanvas();
+}
+
+

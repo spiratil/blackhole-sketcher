@@ -576,3 +576,31 @@ footer {
 footer > * {
   margin: 0 30px;
 }
+
+footer div:last-child {
+  text-align: right;
+}
+
+/* Mobile only CSS */
+.mobile-warning {
+  max-width: calc(var(--content-area-width) * 5 / 20); /* The width of the blackhole */
+  max-height: calc(var(--content-area-height) * 5 / 20); /* The width of the blackhole */
+  margin: auto;
+  text-align: center;
+}
+
+.mobile-warning br {
+  margin: 5px;
+}
+
+@media only screen and (orientation: portrait) {
+  .mobile-warning {
+    font-size: 5cqw;
+  }
+}
+
+@media only screen and (orientation: landscape) {
+  .mobile-warning {
+    font-size: 5cqh;
+  }
+}
