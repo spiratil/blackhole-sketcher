@@ -156,7 +156,7 @@ const grid = (function() {
     cellLength: null, 
     data: null, // The grid data
     radius: null, 
-    ratio: 5 / 18, // Ratio of the blackhole circle to the total image dimensions
+    ratio: 5 / 18, // Ratio of the black hole circle to the total image dimensions
     rows: null, // Array of rows indicating where cells can be placed inside the grid
     totalSqrs: null // The actual number of cells able to fit inside the circle
   };
@@ -318,9 +318,9 @@ const grid = (function() {
 
   // Set the maximum background image size based on the smallest value of the window's width or height
   function resizeDocument() {
-    // Determine the maximum size of the blackhole
+    // Determine the maximum size of the black hole
     const [maxWidth, maxHeight] = (() => {
-      // Calculate a size for the blackhole based on whether this is a mobile or desktop browser
+      // Calculate a size for the black hole based on whether this is a mobile or desktop browser
       if (settings.mobile() === true) return [
         window.innerWidth - 50,
         window.innerHeight - header.clientHeight - footer.clientHeight - 50
@@ -332,7 +332,7 @@ const grid = (function() {
     })();
     const smallest = maxWidth <= maxHeight ? maxWidth : maxHeight;
 
-    // Set the background image width and height to the ratio of the blackhole size
+    // Set the background image width and height to the ratio of the black hole size
     cssVars.style.setProperty('--content-area-height', `${smallest / grid.ratio}px`);
     cssVars.style.setProperty('--content-area-width', `${smallest / grid.ratio}px`);
 
@@ -355,7 +355,7 @@ const grid = (function() {
     //cellLength: () => grid.cellLength, 
     isCanvasReady: () => grid.isCanvasReady,
     radius: () => grid.radius, 
-    ratio: () => grid.ratio, // Ratio of the blackhole cells to the total image dimension cells
+    ratio: () => grid.ratio, // Ratio of the black hole cells to the total image dimension cells
     resizeDocument: (mobile = false) => resizeDocument(mobile),
     rows: () => grid.rows, // Array of rows indicating where cells can be placed inside the grid
     totalSqrs: () => grid.totalSqrs
@@ -570,7 +570,7 @@ const settings = (() => {
     }
   }
 
-  // Create a canvas with the blackhole image and the user's creation in the center and download it
+  // Create a canvas with the black hole image and the user's creation in the center and download it
   async function downloadImage() {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -607,7 +607,7 @@ const settings = (() => {
       }
 
       let link = document.createElement('a');
-      link.download = 'Blackhole Sketcher.jpeg';
+      link.download = 'BlackHole Sketcher.jpeg';
       link.href = canvas.toDataURL('image/jpeg');
       link.click();
     };
@@ -987,7 +987,7 @@ if (settings.mobile() === true) {
   controls.forEach(control => control.style.display = 'none');
   grid.resizeDocument(true);
 
-  // Display a message inside the blackhole
+  // Display a message inside the black hole
   const warning = document.querySelector('.cells-container');
   warning.innerText = 'Sorry!\nThis app is designed to run on a PC.';
   warning.classList.add('mobile-warning');
