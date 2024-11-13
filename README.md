@@ -1,5 +1,5 @@
 # Blackhole Sketcher
-Welcome to the Blackhole Sketcher - A fun and simple drawing app that runs inside your browser.
+Welcome to the [Blackhole Sketcher](https://spiratil.github.io/blackhole-sketcher/) - A fun and simple drawing app that runs inside your browser.
 
 ![Screenshot of the Blackhole Sketcher App](./imgs/screenshot.jpg)
 
